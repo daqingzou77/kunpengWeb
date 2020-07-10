@@ -64,7 +64,6 @@ export async function getAgriculturalData() {
 
 // 条件查询园林数据
 export async function getGardenData(params: requestParam) {
-  console.log('params', params);
   return request('/api/getGardenData', {
     method: 'POST',
     data: {

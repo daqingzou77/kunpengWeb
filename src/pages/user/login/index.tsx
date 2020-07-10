@@ -65,7 +65,6 @@ class Login extends Component<LoginProps, LoginState> {
       if (!this.loginForm) {
         return;
       }
-
       this.loginForm.validateFields(['mobile'], {}, (err: any, values: FormDataType) => {
         if (err) {
           reject(err);
@@ -135,7 +134,6 @@ class Login extends Component<LoginProps, LoginState> {
             ]}
             onPressEnter={(e) => {
               e.preventDefault();
-
               if (this.loginForm) {
                 this.loginForm.validateFields(this.handleSubmit);
               }

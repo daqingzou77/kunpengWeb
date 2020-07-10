@@ -10,6 +10,7 @@ import { SensorData } from './data';
 import { StateType } from './model';
 
 import { connect } from 'dva';
+import SensorCharts from './components/SensorChart';
 
 const { RangePicker } = DatePicker;
 const { TabPane } = Tabs;
@@ -221,6 +222,11 @@ class Trace extends React.PureComponent<CenterProps> {
       >
         <Card>
           <Tabs defaultActiveKey="1" onChange={() => { }}>
+            {/* 传感器 */}
+            {/* <TabPane tab="传感器mock" key="0">
+              <SensorCharts />
+            </TabPane> */}
+            {/* <SensorChart /> */}
             {/* 传感器数据统计 */}
             <TabPane tab="传感器数据统计" key="1">
               <TimelineChart
