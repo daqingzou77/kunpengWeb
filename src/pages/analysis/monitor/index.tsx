@@ -7,6 +7,7 @@ import { connect } from 'dva';
 import { StateType } from './model';
 import Columnar from './components/ChartCustom/Columnar';
 import Polyline from './components/ChartCustom/Polyline';
+import WindDirection from './components/ChartCustom/WindDirection';
 
 const { RangePicker } = DatePicker
 
@@ -91,7 +92,7 @@ class Monitor extends Component<MonitorProps> {
                   marginBottom: 24,
                 }}
               >
-                <Polyline title="风向" />
+                <WindDirection title="风向" />
               </Col>
               <Col xl={8} lg={24} md={24} sm={24} xs={24}
                 style={{
