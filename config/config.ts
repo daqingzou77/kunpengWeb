@@ -228,7 +228,7 @@ export default {
   // },
   proxy: {
     '/api': {
-      target: 'http://localhost:3000'
+      target: 'http://202.193.60.112:8000 '
     }
   }
 } as IConfig;

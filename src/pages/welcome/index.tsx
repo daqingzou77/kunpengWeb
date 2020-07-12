@@ -4,6 +4,7 @@ import { GridContent } from '@ant-design/pro-layout';
 import { RangePickerValue } from 'antd/es/date-picker/interface';
 import { connect } from 'dva';
 import PageLoading from './components/PageLoading';
+import { blockInfo } from './service';
 import { getTimeDistance } from './utils/utils';
 import { AnalysisData } from './data';
 import styles from './style.less';
@@ -35,12 +36,18 @@ class Analysis extends Component<AnalysisProps, AnalysisState> {
   timeoutId: number = 0;
 
   componentDidMount() {
-    const { dispatch } = this.props;
-    this.reqRef = requestAnimationFrame(() => {
-      dispatch({
-        type: 'dashboardAndanalysis/fetch',
-      });
-    });
+    this.getBlockInfo();
+    // const { dispatch } = this.props;
+    // this.reqRef = requestAnimationFrame(() => {
+    //   dispatch({
+    //     type: 'dashboardAndanalysis/fetch',
+    //   });
+    // });
+  }
+
+  getBlockInfo = async () => {
+    const resp = await blockInfo();
+    console.log('resp', resp)
   }
 
   componentWillUnmount() {

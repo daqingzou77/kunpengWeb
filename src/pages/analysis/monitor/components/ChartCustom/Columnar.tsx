@@ -2,11 +2,11 @@ import React from 'react';
 import { Card } from 'antd';
 import { Chart, Axis, Tooltip, Geom } from 'bizcharts';
 
-const ticks = ['we', 'are', 'the', 'black', 'gold', 'team'];
+const ticks = ['java', 'jquery', 'es6', 'black', 'gold', 'team', 'less', 'javascript', '123', '456'];
 
 const mockData = () => {
     const result = [];
-    for (let i = 0, len = 6; i < len; i++) {
+    for (let i = 0, len = 10; i < len; i++) {
         result.push({
             xAxis: ticks[i],
             yAxis: Math.floor(Math.random() * 100)

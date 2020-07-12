@@ -1,20 +1,50 @@
-import request from '@/utils/request';
+import { request as http} from '@/utils/requestCloud';
+import { AxiosRequestConfig } from 'axios';
 
 export interface LoginParamsType {
-  userName: string;
+  username: string;
   password: string;
-  mobile: string;
-  captcha: string;
+  identity?: string;
 }
 
-export async function fakeAccountLogin(params: LoginParamsType) {
-  return request('/api/login/account', {
-    method: 'POST',
-    data: params,
-  });
+export interface responseData {
+  msg?: string;
+  code?: number;
+  data?: any;
 }
 
+// 用户登录
+export function userLogin(data: LoginParamsType): Promise<responseData> {
+  const opt: AxiosRequestConfig={
+    url:`/api/v1/user/login`,
+    method: 'post',
+    params:{},
+    data:{}
+  }
+  opt.data = {
+    user_name: data.username,
+    password: data.password
+  };
+  return http<responseData>(opt)
+}
 
-export async function getFakeCaptcha(mobile: string) {
-  return request(`/api/login/captcha?mobile=${mobile}`);
+// 用户注册
+export function userRigester(data: LoginParamsType): Promise<responseData> {
+  const opt: AxiosRequestConfig={
+    url:`/api/v1/user/register`,
+    method: 'post',
+    params:{},
+    data:{}
+  }
+  opt.data = data;
+  return http<responseData>(opt)
+}
+
+// 用户登出
+export function userLogout(): Promise<responseData> {
+  const opt: AxiosRequestConfig={
+    url:`/api/v1/user/logout`,
+    method: 'post',
+  }
+  return http<responseData>(opt)
 }

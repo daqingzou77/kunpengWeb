@@ -1,22 +1,19 @@
-import request from '@/utils/request';
-import { func } from 'prop-types';
+import { request as http} from '@/utils/requestCloud';
+import { AxiosRequestConfig } from 'axios';
 
-export async function fakeChartData() {
-  return request('/api/fake_chart_data');
+export interface responseData {
+  msg?: string;
+  code?: number;
+  data?: any;
 }
 
 // 获取区块高度、信息数量、总交易量、活跃节点
-export async function getBlockInfo() {
-
+export function blockInfo(): Promise<responseData> {
+  const opt: AxiosRequestConfig={
+    url:`/api/v1/bcs/info`,
+    method: 'get',
+    params:{},
+    data:{}
+  }
+  return http<responseData>(opt)
 }
-
-// 获取信息数
-export async function getInfomation() {
-  
-}
-
-// 获取交易数
-export async function getTransactions() {
-
-}
-

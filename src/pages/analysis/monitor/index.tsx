@@ -8,6 +8,7 @@ import { StateType } from './model';
 import Columnar from './components/ChartCustom/Columnar';
 import Polyline from './components/ChartCustom/Polyline';
 import WindDirection from './components/ChartCustom/WindDirection';
+import { getSensors } from './service';
 
 const { RangePicker } = DatePicker
 
@@ -19,10 +20,18 @@ interface MonitorProps {
 
 class Monitor extends Component<MonitorProps> {
   componentDidMount() {
-    const { dispatch } = this.props;
-    dispatch({
-      type: 'dashboardAndmonitor/fetchTags',
-    });
+    // this.getData();
+  }
+
+  getData = async () => {
+    const data = {
+      sensor_type: 'mqtt',
+      sensor_id: '19372180',
+      start: '2020-07-07 05:17:12',
+      stop: '2020-07-08 15:33:26'
+    }
+    // const resp = await getSensors(data);
+    console.log(resp);
   }
 
   render() {
