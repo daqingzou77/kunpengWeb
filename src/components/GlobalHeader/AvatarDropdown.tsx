@@ -135,7 +135,8 @@ class AvatarDropdown extends React.Component<GlobalHeaderRightProps> {
   render(): React.ReactNode {
     const { menu } = this.props;
     const { modalVisible, loginModalVisible } = this.state;
-    const currentUser = localStorage.getItem('currentUser')
+    const currentUser = localStorage.getItem('currentUser');
+    console.log('currentUser', currentUser)
     const { getFieldDecorator } = this.props.form;
     const formItemLayout = {
       labelCol: {

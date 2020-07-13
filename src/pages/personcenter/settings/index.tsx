@@ -18,6 +18,58 @@ interface SettingsProps {
   currentUser: CurrentUser;
 }
 
+const currentUser = {
+  name: 'Daqing',
+  avatar: 'https://gw.alipayobjects.com/zos/rmsportal/BiazfanxmamNRoxxVxka.png',
+  userid: '00000001',
+  email: 'antdesign@alipay.com',
+  signature: '海纳百川，有容乃大',
+  uploadedItems: 20,
+  title: '交互专家',
+  group: '蚂蚁金服－某某某事业群－某某平台部－某某技术部－UED',
+  tags: [
+    {
+      key: '0',
+      label: '很有想法的',
+    },
+    {
+      key: '1',
+      label: '专注设计',
+    },
+    {
+      key: '2',
+      label: '辣~',
+    },
+    {
+      key: '3',
+      label: '大长腿',
+    },
+    {
+      key: '4',
+      label: '川妹子',
+    },
+    {
+      key: '5',
+      label: '海纳百川',
+    },
+  ],
+  notifyCount: 12,
+  unreadCount: 11,
+  country: 'China',
+  geographic: {
+    province: {
+      label: '浙江省',
+      key: '330000',
+    },
+    city: {
+      label: '杭州市',
+      key: '330100',
+    },
+  },
+  address: '西湖区工专路 77 号',
+  phone: '0752-268888888',
+}
+
 type SettingsStateKeys = 'base' | 'security' | 'binding' | 'notification';
 interface SettingsState {
   mode: 'inline' | 'horizontal';
@@ -43,10 +95,10 @@ class Settings extends Component<SettingsProps, SettingsState> {
   }
 
   componentDidMount() {
-    const { dispatch } = this.props;
-    dispatch({
-      type: 'accountAndsettings/fetchCurrent',
-    })
+    // const { dispatch } = this.props;
+    // dispatch({
+    //   type: 'accountAndsettings/fetchCurrent',
+    // })
     window.addEventListener('resize', this.resize);
     this.resize();
   }
@@ -98,21 +150,6 @@ class Settings extends Component<SettingsProps, SettingsState> {
     });
   };
 
-  getAvatarURL() {
-    const { currentUser } = this.props;
-
-    if (currentUser) {
-      if (currentUser.avatar) {
-        return currentUser.avatar;
-      }
-
-      const url = 'https://gw.alipayobjects.com/zos/rmsportal/BiazfanxmamNRoxxVxka.png';
-      return url;
-    }
-
-    return '';
-  }
-
   renderChildren = () => {
     const { selectKey } = this.state;
 
@@ -137,11 +174,11 @@ class Settings extends Component<SettingsProps, SettingsState> {
   };
 
   render() {
-    const { currentUser } = this.props;
+    // const { currentUser } = this.props;
 
-    if (!currentUser.userid) {
-      return '';
-    }
+    // if (!currentUser.userid) {
+    //   return '';
+    // }
 
     return (
       <PageHeaderWrapper>
@@ -214,14 +251,15 @@ class Settings extends Component<SettingsProps, SettingsState> {
   }
 }
 
-export default connect(
-  ({
-    accountAndsettings,
-  }: {
-    accountAndsettings: {
-      currentUser: CurrentUser;
-    };
-  }) => ({
-    currentUser: accountAndsettings.currentUser,
-  }),
-)(Settings);
+export default Settings;
+// export default connect(
+//   ({
+//     accountAndsettings,
+//   }: {
+//     accountAndsettings: {
+//       currentUser: CurrentUser;
+//     };
+//   }) => ({
+//     currentUser: accountAndsettings.currentUser,
+//   }),
+// )(Settings);

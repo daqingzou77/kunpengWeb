@@ -1,17 +1,42 @@
-import request from '@/utils/request';
+import { request as http } from '@/utils/requestCloud';
+import { AxiosRequestConfig } from 'axois';
 
-export async function queryCurrent() {
-  return request('/api/currentUser');
+export interface responseData {
+  msg?: string;
+  code?: number;
+  data?: any;
 }
 
-export async function queryProvince() {
-  return request('/api/geographic/province');
+// 获取头像
+export function getAvatar(): Promise<responseData> {
+  const opt: AxiosRequestConfig = {
+    url:`/api/v1/user/getHeader`,
+    method: 'post',
+    params:{},
+    data:{}
+  }
+  return http<responseData>(opt)
 }
 
-export async function queryCity(province: string) {
-  return request(`/api/geographic/city/${province}`);
+
+// 获取登录用户信息
+export function getLoginUser(): Promise<responseData> {
+  const opt: AxiosRequestConfig = {
+    url:`/api/v1/user/current`,
+    method: 'get',
+    params:{},
+    data:{}
+  }
+  return http<responseData>(opt)
 }
 
-export async function query() {
-  return request('/api/users');
+// 修改登录用户信息
+export function updateLoginUser(): Promise<responseData> {
+  const opt: AxiosRequestConfig = {
+    url:`/api/v1/user/password`,
+    method: 'post',
+    params:{},
+    data:{}
+  }
+  return http<responseData>(opt)
 }

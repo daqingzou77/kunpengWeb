@@ -1,11 +1,9 @@
 import { InfoCircleOutlined } from '@ant-design/icons';
-import { Col, Row, Tooltip, Icon, Avatar } from 'antd';
+import { Col, Row, Tooltip, Avatar } from 'antd';
 import React from 'react';
 import numeral from 'numeral';
-import { ChartCard, MiniArea, MiniBar, MiniProgress, Field } from './Charts';
-import { VisitDataType } from '../data';
-import Trend from './Trend';
-import styles from '../style.less'; // 支持响应式
+import { ChartCard } from './Charts';
+import { BlockInfo } from '../data';
 
 const topColResponsiveProps = {
   xs: 24,
@@ -18,7 +16,7 @@ const topColResponsiveProps = {
   },
 };
 
-const IntroduceRow = ({ loading, visitData }: { loading: boolean; visitData: VisitDataType[] }) => (
+const IntroduceRow = ({ loading, blockInfo }: { loading: boolean, blockInfo: BlockInfo }) => (
   <Row gutter={24} type="flex">
     {/* 区块高度 */}
     <Col {...topColResponsiveProps}>
@@ -26,7 +24,7 @@ const IntroduceRow = ({ loading, visitData }: { loading: boolean; visitData: Vis
         bordered={false}
         title="区块高度"
         action={
-          <Tooltip title="当前区块高度为">
+          <Tooltip title={`当前区块高度为${blockInfo.height}`}>
             <InfoCircleOutlined />
           </Tooltip>
         }
@@ -39,7 +37,7 @@ const IntroduceRow = ({ loading, visitData }: { loading: boolean; visitData: Vis
           />
         }
         loading={loading}
-        total={() => 200}
+        total={numeral(blockInfo.height).format('0,0')}
         contentHeight={46}
       ></ChartCard>
     </Col>
@@ -51,11 +49,11 @@ const IntroduceRow = ({ loading, visitData }: { loading: boolean; visitData: Vis
         loading={loading}
         title="信息数量"
         action={
-          <Tooltip title="系统信息交易数为">
+          <Tooltip title={`系统信息交易数为${blockInfo.messages}`}>
             <InfoCircleOutlined />
           </Tooltip>
         }
-        total={numeral(88).format('0,0')}
+        total={numeral(blockInfo.messages).format('0,0')}
         avatar={
           <Avatar
             style={{
@@ -75,11 +73,11 @@ const IntroduceRow = ({ loading, visitData }: { loading: boolean; visitData: Vis
         loading={loading}
         title="总交易量"
         action={
-          <Tooltip title="系统交易总量为">
+          <Tooltip title={`系统交易总量为${blockInfo.messages}`}>
             <InfoCircleOutlined />
           </Tooltip>
         }
-        total={numeral(6560).format('0,0')}
+        total={numeral(blockInfo.messages).format('0,0')}
         avatar={
           <Avatar
             style={{
@@ -99,11 +97,11 @@ const IntroduceRow = ({ loading, visitData }: { loading: boolean; visitData: Vis
         bordered={false}
         title="活跃节点"
         action={
-          <Tooltip title="当前系统活跃节点数为">
+          <Tooltip title={`当前系统活跃节点数为${blockInfo.nodes}`}>
             <InfoCircleOutlined />
           </Tooltip>
         }
-        total={numeral(6).format('0,0')}
+        total={numeral(blockInfo.nodes).format('0,0')}
         avatar={
           <Avatar
             style={{

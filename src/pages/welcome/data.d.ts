@@ -40,3 +40,9 @@ export interface AnalysisData {
   salesTypeDataOffline: VisitDataType[];
   radarData: RadarData[];
 }
+
+export interface BlockInfo {
+  height?: string,
+  messages?: string,
+  nodes?: string
+}

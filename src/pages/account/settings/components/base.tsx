@@ -8,27 +8,12 @@ import { connect } from 'dva';
 import { CurrentUser } from '../data.d';
 import GeographicView from './GeographicView';
 import PhoneView from './PhoneView';
+import { updateAvartar } from '../service';
 import styles from './BaseView.less';
 
 const FormItem = Form.Item;
 const { Option } = Select; // 头像组件 方便以后独立，增加裁剪之类的功能
 
-const AvatarView = ({ avatar }: { avatar: string }) => (
-  <Fragment>
-    <div className={styles.avatar_title}>头像</div>
-    <div className={styles.avatar}>
-      <img src={avatar} alt="avatar" />
-    </div>
-    <Upload showUploadList={false}>
-      <div className={styles.button_view}>
-        <Button>
-          <UploadOutlined />
-          更换头像
-        </Button>
-      </div>
-    </Upload>
-  </Fragment>
-);
 
 interface SelectItem {
   label: string;
@@ -74,8 +59,18 @@ interface BaseViewProps extends FormComponentProps {
   currentUser?: CurrentUser;
 }
 
+function getBase64(img: any, callback: any) {
+  const reader = new FileReader();
+  reader.addEventListener('load', () => callback(reader.result));
+  reader.readAsDataURL(img);
+}
+
 class BaseView extends Component<BaseViewProps> {
   view: HTMLDivElement | undefined = undefined;
+
+   state = {
+    imageUrl: 'https://gw.alipayobjects.com/zos/rmsportal/BiazfanxmamNRoxxVxka.png'
+   }
 
   componentDidMount() {
     this.setBaseInfo();
@@ -93,21 +88,6 @@ class BaseView extends Component<BaseViewProps> {
     }
   };
 
-  getAvatarURL() {
-    const { currentUser } = this.props;
-
-    if (currentUser) {
-      if (currentUser.avatar) {
-        return currentUser.avatar;
-      }
-
-      const url = 'https://gw.alipayobjects.com/zos/rmsportal/BiazfanxmamNRoxxVxka.png';
-      return url;
-    }
-
-    return '';
-  }
-
   getViewDom = (ref: HTMLDivElement) => {
     this.view = ref;
   };
@@ -122,10 +102,57 @@ class BaseView extends Component<BaseViewProps> {
     });
   };
 
+  // 头像上传前处理
+  handleBefore = (file: any) => {
+    const isJpgOrPng = file.type === 'image/jpeg' || file.type === 'image/png';
+    if (!isJpgOrPng) {
+      message.error('You can only upload JPG/PNG file!');
+    }
+    const isLt2M = file.size / 1024 / 1024 < 2;
+    if (!isLt2M) {
+      message.error('Image must smaller than 2MB!');
+    }
+    return isJpgOrPng && isLt2M;
+  }
+
+  handleChange = (info: any) => {
+    if (info.file.status === 'done') {
+      // Get this url from response in real world.
+      getBase64(info.file.originFileObj, (imageUrl: string) =>
+        this.setState({
+          imageUrl,
+        }),
+      );
+    }
+  }
+
   render() {
     const {
       form: { getFieldDecorator },
     } = this.props;
+    const { imageUrl } = this.state;
+    // 更换头像组件
+    const AvatarView = ({ avatar }: { avatar: string }) => (
+      <Fragment>
+        <div className={styles.avatar_title}>头像</div>
+        <div className={styles.avatar}>
+          <img src={avatar} alt="avatar" />
+        </div>
+        <Upload
+          action='/api/v1/user/setHeader'
+          showUploadList={false}
+          // beforeUpload={file => this.handleBefore(file)}
+          // onChange={this.handleChange}
+        >
+          <div className={styles.button_view}>
+            <Button>
+              <UploadOutlined />
+              更换头像
+            </Button>
+          </div>
+        </Upload>
+      </Fragment>
+    );
     return (
       <div className={styles.baseView} ref={this.getViewDom}>
         <div className={styles.left}>
@@ -214,13 +241,13 @@ class BaseView extends Component<BaseViewProps> {
                 ],
               })(<PhoneView />)}
             </FormItem>
-            <Button type="primary" onClick={this.handlerSubmit}>
+            {/* <Button type="primary" onClick={this.handlerSubmit}>
               更新基本信息
-            </Button>
+            </Button> */}
           </Form>
         </div>
         <div className={styles.right}>
-          <AvatarView avatar={this.getAvatarURL()} />
+          <AvatarView avatar={imageUrl} />
         </div>
       </div>
     );

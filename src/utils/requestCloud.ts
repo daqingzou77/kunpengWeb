@@ -31,7 +31,6 @@ service.interceptors.response.use(
     // code == 401: invalid access token
     // You can change this part for your own usage.
     const res = response.data;
-    // console.log(response)
     const {
       config: { url },
     } = response;
@@ -42,14 +41,6 @@ service.interceptors.response.use(
         message: `请求错误 ${res.code}: ${url}`,
         description: res.msg,
       });
-      // if (res.code === 401) {
-      //   // go to Login
-      //   notification.error({
-      //     type: 'error',
-      //     message: `请求错误 ${res.code}:`,
-      //     description: res.msg,
-      //   });
-      // }
       return Promise.reject(new Error(res.msg || 'Error'));
     }
     return response;
@@ -57,7 +48,11 @@ service.interceptors.response.use(
   (error: AxiosError) => {
     const response = error.response! || ({} as AxiosResponse);
     const { data = {} } = response;
-    console.warn(data);
+    console.log(response)
+    if (response.status === 401) {
+      localStorage.removeItem('currentUser');
+      localStorage.removeItem('token')
+    }
     const { data: innerData = {} } = data;
     const resp = {
       code: data.code || response.status,

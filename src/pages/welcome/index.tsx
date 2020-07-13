@@ -4,9 +4,10 @@ import { GridContent } from '@ant-design/pro-layout';
 import { RangePickerValue } from 'antd/es/date-picker/interface';
 import { connect } from 'dva';
 import PageLoading from './components/PageLoading';
+// eslint-disable-next-line import/no-unresolved
+import { AnalysisData, BlockInfo } from './data';
 import { blockInfo } from './service';
 import { getTimeDistance } from './utils/utils';
-import { AnalysisData } from './data';
 import styles from './style.less';
 
 const IntroduceRow = React.lazy(() => import('./components/IntroduceRow'));
@@ -35,19 +36,18 @@ class Analysis extends Component<AnalysisProps, AnalysisState> {
 
   timeoutId: number = 0;
 
+  blocks: BlockInfo = {};
+
   componentDidMount() {
     this.getBlockInfo();
-    // const { dispatch } = this.props;
-    // this.reqRef = requestAnimationFrame(() => {
-    //   dispatch({
-    //     type: 'dashboardAndanalysis/fetch',
-    //   });
-    // });
   }
 
+  // eslint-disable-next-line react/sort-comp
   getBlockInfo = async () => {
     const resp = await blockInfo();
-    console.log('resp', resp)
+    if (resp.msg === 'ok') {
+     this.blocks = resp.data;
+    }
   }
 
   componentWillUnmount() {
@@ -109,7 +109,7 @@ class Analysis extends Component<AnalysisProps, AnalysisState> {
         <React.Fragment>
           {/* Suspense进行lazy组件的包裹 */}
           <Suspense fallback={<PageLoading />}>
-            <IntroduceRow loading={loading} visitData={visitData} />
+            <IntroduceRow loading={loading} blockInfo={this.blocks} />
           </Suspense>
 
           {/* 折线统计 */}
