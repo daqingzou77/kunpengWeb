@@ -2,13 +2,14 @@ import React, { Component } from 'react';
 import { Dispatch } from 'redux';
 import { GridContent, PageHeaderWrapper } from '@ant-design/pro-layout';
 import { Menu, Row, Col, Card, Icon } from 'antd';
-import { connect } from 'dva';
 import BaseView from './components/base';
 import BindingView from './components/binding';
 import { CurrentUser } from './data';
 import NotificationView from './components/notification';
 import SecurityView from './components/security';
+import { getLoginUser } from './service';
 import styles from './style.less';
+import { string } from 'prop-types';
 
 const { Item } = Menu; // 头像组件 方便以后独立，增加裁剪之类的功能
 
@@ -18,57 +19,6 @@ interface SettingsProps {
   currentUser: CurrentUser;
 }
 
-const currentUser = {
-  name: 'Daqing',
-  avatar: 'https://gw.alipayobjects.com/zos/rmsportal/BiazfanxmamNRoxxVxka.png',
-  userid: '00000001',
-  email: 'antdesign@alipay.com',
-  signature: '海纳百川，有容乃大',
-  uploadedItems: 20,
-  title: '交互专家',
-  group: '蚂蚁金服－某某某事业群－某某平台部－某某技术部－UED',
-  tags: [
-    {
-      key: '0',
-      label: '很有想法的',
-    },
-    {
-      key: '1',
-      label: '专注设计',
-    },
-    {
-      key: '2',
-      label: '辣~',
-    },
-    {
-      key: '3',
-      label: '大长腿',
-    },
-    {
-      key: '4',
-      label: '川妹子',
-    },
-    {
-      key: '5',
-      label: '海纳百川',
-    },
-  ],
-  notifyCount: 12,
-  unreadCount: 11,
-  country: 'China',
-  geographic: {
-    province: {
-      label: '浙江省',
-      key: '330000',
-    },
-    city: {
-      label: '杭州市',
-      key: '330100',
-    },
-  },
-  address: '西湖区工专路 77 号',
-  phone: '0752-268888888',
-}
 
 type SettingsStateKeys = 'base' | 'security' | 'binding' | 'notification';
 interface SettingsState {
@@ -77,6 +27,7 @@ interface SettingsState {
     [key: string]: React.ReactNode;
   };
   selectKey: SettingsStateKeys;
+  avatar: 'https://gw.alipayobjects.com/zos/rmsportal/BiazfanxmamNRoxxVxka.png';
 }
 
 class Settings extends Component<SettingsProps, SettingsState> {
@@ -91,20 +42,41 @@ class Settings extends Component<SettingsProps, SettingsState> {
       mode: 'inline',
       menuMap,
       selectKey: 'base',
+      avatar: 'https://gw.alipayobjects.com/zos/rmsportal/BiazfanxmamNRoxxVxka.png',
+      username: '',
+      signature: '',
+      email: '',
+      phone: '',
+      address: '',
     };
   }
+
 
   componentDidMount() {
     // const { dispatch } = this.props;
     // dispatch({
     //   type: 'accountAndsettings/fetchCurrent',
     // })
+    this.getUser();
     window.addEventListener('resize', this.resize);
     this.resize();
   }
 
   componentWillUnmount() {
     window.removeEventListener('resize', this.resize);
+  }
+
+  getUser = async () => {
+    const resp = await getLoginUser();
+    if (resp.msg === 'ok') {
+      const { data: { username, email, address, phone } } = resp.data;
+      this.setState({
+        username,
+        email,
+        address,
+        phone
+      })
+    }
   }
 
   getMenu = () => {
@@ -174,11 +146,7 @@ class Settings extends Component<SettingsProps, SettingsState> {
   };
 
   render() {
-    // const { currentUser } = this.props;
-
-    // if (!currentUser.userid) {
-    //   return '';
-    // }
+  const { username, signature, phone, email, address, avatar } = this.state;
 
     return (
       <PageHeaderWrapper>
@@ -193,9 +161,9 @@ class Settings extends Component<SettingsProps, SettingsState> {
               >
                 <div>
                   <div className={styles.avatarHolder}>
-                    <img alt="" src={currentUser.avatar} />
-                    <div className={styles.name}>{currentUser.name}</div>
-                    <div>{currentUser.signature}</div>
+                    <img alt="" src={avatar} />
+                    <div className={styles.name}>{username}</div>
+                    <div>{signature}</div>
                   </div>
                   <div className={styles.detail}>
                     <p>
@@ -208,22 +176,22 @@ class Settings extends Component<SettingsProps, SettingsState> {
                             fontSize: 14,
                           }}
                         >
-                          {currentUser.uploadedItems}
+                          0
                         </span>
                         条农事记录
                       </div>
                     </p>
                     <p>
                       <Icon type="phone" />
-                      {currentUser.phone}
+                      {phone}
                     </p>
                     <p>
                       <Icon type="mail" />
-                      {currentUser.email}
+                      {email}
                     </p>
                     <p>
                       <Icon type="bank" />
-                      {currentUser.address}
+                      {address}
                     </p>
                   </div>
                 </div>
@@ -252,14 +220,3 @@ class Settings extends Component<SettingsProps, SettingsState> {
 }
 
 export default Settings;
-// export default connect(
-//   ({
-//     accountAndsettings,
-//   }: {
-//     accountAndsettings: {
-//       currentUser: CurrentUser;
-//     };
-//   }) => ({
-//     currentUser: accountAndsettings.currentUser,
-//   }),
-// )(Settings);

@@ -27,45 +27,41 @@ function getBase64(img: any, callback: any) {
   reader.readAsDataURL(img);
 }
 
+
 class BaseView extends Component<BaseViewProps> {
   view: HTMLDivElement | undefined = undefined;
 
   state = {
     imageUrl: 'https://gw.alipayobjects.com/zos/rmsportal/BiazfanxmamNRoxxVxka.png',
-    username: '',
     address: '',
     phone: '',
     email: '',
   }
 
   componentDidMount() {
-    // this.setBaseInfo();
-    // this.getAvatarContent();
+    // this.getAvatar();
     this.getUserList();
   }
 
-  getAvatarContent = () => {
-
+  getAvatar = async () => {
+    const avatar = await getAvatar();
   }
 
-  getUserList = async () => {  
+  getUserList = async () => {
     const resp = await getLoginUser();
-    console.log('resp', resp)
     if (resp.msg === 'ok') {
       const { data: { username, email, address, phone } } = resp.data;
-      console.log(username)
       this.setState({
         username,
         email,
         address,
         phone
-      }) 
+      })
     }
   }
 
   setBaseInfo = () => {
     const { currentUser, form } = this.props;
-
     if (currentUser) {
       Object.keys(form.getFieldsValue()).forEach((key) => {
         const obj = {};
@@ -82,8 +78,11 @@ class BaseView extends Component<BaseViewProps> {
   handlerSubmit = (event: React.MouseEvent) => {
     event.preventDefault();
     const { form } = this.props;
-    form.validateFields((err) => {
+    form.validateFields(async (err, values) => {
       if (!err) {
+        const { address, email, phone } = values;
+        const resp = await updateLoginUser({address, email,phone});
+        console.log(resp);
         message.success('更新基本信息成功');
       }
     });
@@ -95,9 +94,9 @@ class BaseView extends Component<BaseViewProps> {
     if (!isJpgOrPng) {
       message.error('You can only upload JPG/PNG file!');
     }
-    const isLt2M = file.size / 1024 / 1024 < 2;
+    const isLt2M = file.size / 1024 / 1024 < 1;
     if (!isLt2M) {
-      message.error('Image must smaller than 2MB!');
+      message.error('Image must smaller than 1MB!');
     }
     return isJpgOrPng && isLt2M;
   }
@@ -131,7 +130,7 @@ class BaseView extends Component<BaseViewProps> {
           showUploadList={false}
           beforeUpload={file => this.handleBefore(file)}
           onChange={this.handleChange}
-          headers={{ Authorization: token}}
+          headers={{ Authorization: token }}
         >
           <div className={styles.button_view}>
             <Button>
@@ -172,10 +171,6 @@ class BaseView extends Component<BaseViewProps> {
             <FormItem label="已上传农事记录数据条数">
               {getFieldDecorator('uploadedItems', {
                 rules: [
-                  {
-                    required: true,
-                    message: '',
-                  },
                 ],
               })(<Input disabled />)}
             </FormItem>

@@ -81,12 +81,9 @@ class AvatarDropdown extends React.Component<GlobalHeaderRightProps> {
   }
 
   handleLogout = async () => {
-    const resp = await userLogout();
-    if (resp.msg === 'ok') {
-      localStorage.removeItem('token');
-      localStorage.removeItem('currentUser');
-      window.location.reload()
-    }
+    localStorage.removeItem('token');
+    localStorage.removeItem('currentUser');
+    window.location.reload()
   }
 
   // 登录提交

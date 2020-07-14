@@ -10,10 +10,12 @@ import { Form } from '@ant-design/compatible';
 import { Dispatch } from 'redux';
 import { FormComponentProps } from '@ant-design/compatible/es/form';
 import { PageHeaderWrapper } from '@ant-design/pro-layout';
+import { uploadRecord } from './service';
 import { connect } from 'dva';
 
 const FormItem = Form.Item;
 const { TextArea } = Input;
+const { RangePicker } = DatePicker; 
 
 interface BasicFormProps extends FormComponentProps {
   submitting: boolean;
@@ -23,14 +25,11 @@ interface BasicFormProps extends FormComponentProps {
 class BasicForm extends Component<BasicFormProps> {
 
   handleSubmit = (e: React.FormEvent) => {
-    const { dispatch, form } = this.props;
+    const { form } = this.props;
     e.preventDefault();
     form.validateFieldsAndScroll((err, values) => {
       if (!err) {
-        dispatch({
-          type: 'formAndbasicForm/submitRegularForm',
-          payload: values,
-        });
+ 
       }
     });
   };
@@ -99,7 +98,7 @@ class BasicForm extends Component<BasicFormProps> {
             }}
           >
             <FormItem {...formItemLayout} label="操作名称">
-              {getFieldDecorator('title', {
+              {getFieldDecorator('oper_name', {
                 rules: [
                   {
                     required: true,
@@ -117,12 +116,7 @@ class BasicForm extends Component<BasicFormProps> {
                   },
                 ],
               })(
-                <DatePicker
-                  style={{
-                    width: '100%',
-                  }}
-                  placeholder="请选择操作日期"
-                />,
+                <RangePicker  />,
               )}
             </FormItem>
             <FormItem {...formItemLayout} label="操作行为">
@@ -137,7 +131,7 @@ class BasicForm extends Component<BasicFormProps> {
               })(<Checkbox.Group options={options} />)}
             </FormItem>
             <FormItem {...formItemLayout} label="具体信息">
-              {getFieldDecorator('goal', {
+              {getFieldDecorator('info', {
                 rules: [
                   {
                     required: true,
@@ -168,6 +162,7 @@ class BasicForm extends Component<BasicFormProps> {
                 type="primary"
                 htmlType="submit"
                 loading={submitting}
+                onClick={this.handleSubmit}
               >
                 上传
               </Button>

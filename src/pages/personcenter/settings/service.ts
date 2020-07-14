@@ -31,12 +31,17 @@ export function getLoginUser(): Promise<responseData> {
 }
 
 // 修改登录用户信息
-export function updateLoginUser(): Promise<responseData> {
+export function updateLoginUser(data:{ address?:string, email?: string, phone?: string }): Promise<responseData> {
   const opt: AxiosRequestConfig = {
-    url:`/api/v1/user/password`,
+    url:`/api/v1/user/update`,
     method: 'post',
     params:{},
     data:{}
+  }
+  opt.data = {
+    address: data.address,
+    email: data.email,
+    phone: data.phone
   }
   return http<responseData>(opt)
 }
