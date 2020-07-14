@@ -4,6 +4,7 @@ import {
   DatePicker,
   Input,
   Checkbox,
+  message,
 } from 'antd';
 import React, { Component } from 'react';
 import { Form } from '@ant-design/compatible';
@@ -24,12 +25,34 @@ interface BasicFormProps extends FormComponentProps {
 
 class BasicForm extends Component<BasicFormProps> {
 
+  state ={
+    loading: false
+  }
+
   handleSubmit = (e: React.FormEvent) => {
     const { form } = this.props;
+    this.setState({
+      loading: true
+    })
     e.preventDefault();
-    form.validateFieldsAndScroll((err, values) => {
+    form.validateFieldsAndScroll(async (err, values) => {
       if (!err) {
- 
+        const { oper_name, oper_type, date, info, } = values;
+        const req = {
+          oper_name,
+          oper_type: oper_type.join(','),
+          start_time: date[0],
+          end_time: date[1],
+          info
+        }
+        const resp = await uploadRecord(req);
+        if (resp.msg === 'ok') {
+          message.success('农事数据上传成功');
+          this.setState({
+            loading: false
+          })
+        }
+        form.resetFields();
       }
     });
   };
@@ -37,6 +60,7 @@ class BasicForm extends Component<BasicFormProps> {
 
   render() {
     const { submitting } = this.props;
+    const { loading } = this.state;
     const {
       form: { getFieldDecorator },
     } = this.props;
@@ -102,7 +126,7 @@ class BasicForm extends Component<BasicFormProps> {
                 rules: [
                   {
                     required: true,
-                    message: 'formandbasic-form.title.required',
+                    message: '操作名称不能为空',
                   },
                 ],
               })(<Input placeholder="请输入操作行为的名称" />)}
@@ -112,20 +136,20 @@ class BasicForm extends Component<BasicFormProps> {
                 rules: [
                   {
                     required: true,
-                    message: 'formandbasic-form.date.required',
+                    message: '操作时间不能为空',
                   },
                 ],
               })(
-                <RangePicker  />,
+                <RangePicker  placeholder={['开始时间', '结束时间']} />,
               )}
             </FormItem>
             <FormItem {...formItemLayout} label="操作行为">
-              {getFieldDecorator('operations', {
+              {getFieldDecorator('oper_type', {
                 initialValue: 'shifei',
                 rules: [
                   {
                     required: true,
-                    message: 'formandbasic-form.date.required',
+                    message: '操作行为不能为空',
                   },
                 ],
               })(<Checkbox.Group options={options} />)}
@@ -135,7 +159,7 @@ class BasicForm extends Component<BasicFormProps> {
                 rules: [
                   {
                     required: true,
-                    message: 'formandbasic-form.goal.required',
+                    message: '具体信息不能为空',
                   },
                 ],
               })(
@@ -161,7 +185,7 @@ class BasicForm extends Component<BasicFormProps> {
                 }}
                 type="primary"
                 htmlType="submit"
-                loading={submitting}
+                loading={loading}
                 onClick={this.handleSubmit}
               >
                 上传

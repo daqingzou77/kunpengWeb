@@ -39,12 +39,17 @@ class BaseView extends Component<BaseViewProps> {
   }
 
   componentDidMount() {
-    // this.getAvatar();
+    this.getAvatar();
     this.getUserList();
   }
 
   getAvatar = async () => {
-    const avatar = await getAvatar();
+    const resp = await getAvatar();
+    if (resp.msg === 'ok') {
+      this.setState({
+        imageUrl: `http://202.193.60.112:8000/header/${resp.data}`
+      })
+    }
   }
 
   getUserList = async () => {

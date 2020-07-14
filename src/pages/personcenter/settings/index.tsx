@@ -7,7 +7,7 @@ import BindingView from './components/binding';
 import { CurrentUser } from './data';
 import NotificationView from './components/notification';
 import SecurityView from './components/security';
-import { getLoginUser } from './service';
+import { getLoginUser, getAvatar } from './service';
 import styles from './style.less';
 import { string } from 'prop-types';
 
@@ -53,17 +53,23 @@ class Settings extends Component<SettingsProps, SettingsState> {
 
 
   componentDidMount() {
-    // const { dispatch } = this.props;
-    // dispatch({
-    //   type: 'accountAndsettings/fetchCurrent',
-    // })
     this.getUser();
+    this.getAvatarUrl();
     window.addEventListener('resize', this.resize);
     this.resize();
   }
 
   componentWillUnmount() {
     window.removeEventListener('resize', this.resize);
+  }
+
+  getAvatarUrl = async () => {
+    const resp = await getAvatar();
+    if (resp.msg === 'ok') {
+      this.setState({
+        avatar: `http://202.193.60.112:8000/header/${resp.data}`
+      })
+    }
   }
 
   getUser = async () => {
@@ -161,7 +167,7 @@ class Settings extends Component<SettingsProps, SettingsState> {
               >
                 <div>
                   <div className={styles.avatarHolder}>
-                    <img alt="" src={avatar} />
+                    <img alt="用户头像" src={avatar} width={70} height={70} style={{ borderRadius: '50%' }} />
                     <div className={styles.name}>{username}</div>
                     <div>{signature}</div>
                   </div>

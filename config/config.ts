@@ -229,6 +229,11 @@ export default {
   proxy: {
     '/api': {
       target: 'http://202.193.60.112:8000 '
-    }
+    },
+    '/apiCloud': {
+      target: 'http://202.193.60.10:6667',
+      changeOrigin: true,
+      pathRewrite: { '^/apiCloud': '/api' },
+    },
   }
 } as IConfig;

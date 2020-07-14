@@ -11,7 +11,7 @@ export interface responseData {
 export function getAvatar(): Promise<responseData> {
   const opt: AxiosRequestConfig = {
     url:`/api/v1/user/getHeader`,
-    method: 'post',
+    method: 'get',
     params:{},
     data:{}
   }
