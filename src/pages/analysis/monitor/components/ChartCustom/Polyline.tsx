@@ -27,38 +27,8 @@ const AirPressure: React.FC<any> = ({ title, xAxias, yAxias, data }) => {
       className={styles.pieCard}
     >
       <Chart height={300} data={data} scale={cols} forceFit padding="auto">
-        <Axis name={xAxias}
-        // title={{
-        //   position: 'end',
-        //   offset: 15,
-        //   textStyle: {
-        //     fontSize: '12',
-        //     textAlign: 'center',
-        //     fill: '#999',
-        //     fontWeight: 'bold',
-        //     rotate: 0,
-        //     autoRotate: true
-        //   }
-        // }}
-        />
-        <Axis name={yAxias}
-        // title={{
-        //   position: 'end',
-        //   offset: 5.5,
-        //   textStyle: {
-        //     fontSize: '12',
-        //     textAlign: 'right',
-        //     fill: '#999',
-        //     fontWeight: 'bold',
-        //     rotate: 0
-        //   }
-        // }}
-        />
-        {/* <Tooltip
-        crosshairs={{
-          type: "y"
-        }}
-      /> */}
+        <Axis name={xAxias} />
+        <Axis name={yAxias} />
         <Tooltip />
         <Geom type="line" position={`${xAxias}*${yAxias}`} size={2}
           tooltip={[`${xAxias}*${yAxias}`, (xAxias, yAxias) => {

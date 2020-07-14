@@ -1,5 +1,5 @@
 /* eslint-disable no-shadow */
-import { Avatar, Icon, Menu, Modal, Form, Input, message } from 'antd';
+import { Avatar, Icon, Menu, Modal, Form, Input, message, Button } from 'antd';
 import { LogoutOutlined, LoginOutlined } from '@ant-design/icons';
 import { ClickParam } from 'antd/es/menu';
 import React from 'react';
@@ -20,18 +20,13 @@ class AvatarDropdown extends React.Component<GlobalHeaderRightProps> {
   state = {
     modalVisible: false,
     loginModalVisible: false,
+    loading: false
   }
 
   onMenuClick = (event: ClickParam) => {
     const { key } = event;
     if (key === 'logout') {
       this.handleLogout()
-      // const { dispatch } = this.props;
-      // if (dispatch) {
-      //   dispatch({
-      //     type: 'login/logout',
-      //   });
-      // }
       return;
     }
     router.push(`/account/${key}`);
@@ -113,6 +108,9 @@ class AvatarDropdown extends React.Component<GlobalHeaderRightProps> {
   // 注册提交
   handleOnSubmitRigster = () => {
     const { form } = this.props;
+    this.setState({
+      loading: true
+    })
     form.validateFields(async (_: any, values: any) => {
       const { username, password, identity } = values;
       const resp = await userRigester({ username, password, identity});
@@ -123,7 +121,8 @@ class AvatarDropdown extends React.Component<GlobalHeaderRightProps> {
         message.error('用户注册失败');
       }
       this.setState({
-        modalVisible: false
+        modalVisible: false,
+        loading: false
       })
       form.resetFields();
     });
@@ -131,7 +130,7 @@ class AvatarDropdown extends React.Component<GlobalHeaderRightProps> {
 
   render(): React.ReactNode {
     const { menu } = this.props;
-    const { modalVisible, loginModalVisible } = this.state;
+    const { modalVisible, loginModalVisible, loading } = this.state;
     const currentUser = localStorage.getItem('currentUser');
     console.log('currentUser', currentUser)
     const { getFieldDecorator } = this.props.form;
@@ -183,6 +182,10 @@ class AvatarDropdown extends React.Component<GlobalHeaderRightProps> {
         <Modal
           title="用户注册"
           visible={modalVisible}
+          footer={[
+            <Button key="cancel" onClick={this.handleRigsterCancel}>取消</Button>,
+            <Button key="ok" loading={loading} onClick={this.handleOnSubmitRigster}>注册</Button>
+          ]}
           onCancel={this.handleRigsterCancel}
           onOk={this.handleOnSubmitRigster}
           okText="注册"

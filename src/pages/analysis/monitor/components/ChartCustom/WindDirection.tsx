@@ -6,10 +6,22 @@ import { Chart, Shape, Geom, Axis, Tooltip } from 'bizcharts';
 if (Shape.registerShape) {
     Shape.registerShape('point', 'wind', {
         draw(cfg: any, container: any) {
-            const group = container.addGroup();
             cfg.points = this.parsePoints(cfg.points);
-            const { deg } = cfg.origin._origin;
-            container.addShape('text', {
+            const coord = this._coord;
+            const { windDirection } = cfg.origin._origin;
+            console.log(cfg)
+            container.addShape('line', {
+                attrs: {
+                    x1: cfg.points[0].x,
+                    y1: cfg.points[0].y,
+                    x2: cfg.points[0].x,
+                    y2: coord.start.y,
+                    stroke: "#ccc",
+                    lineWidth: 1,
+                    lineDash: [4, 2]
+                }
+            });
+            return container.addShape('text', {
                 attrs: {
                     x: cfg.points[0].x,
                     y: cfg.points[0].y,
@@ -17,82 +29,35 @@ if (Shape.registerShape) {
                     text: '➤',
                     fontSize: cfg.size,
                     textBaseline: 'middle',
-                    rotate: 270 + deg
+                    rotate: 270 + windDirection
                 },
             });
-            return group;
         },
     });
 }
 
-const dataMock: Array<any> = [
-    {
-        name: "风向1",
-        value: 1,
-        deg: 30
-    },
-    {
-        name: "风向2",
-        value: 1.5,
-        deg: 75
-    },
-    {
-        name: "风向3",
-        value: 2,
-        deg: 120
-    },
-    {
-        name: "风向4",
-        value: 1,
-        deg: 220
-    },
-    {
-        name: "风向5",
-        value: 2,
-        deg: 330
-    },
-    {
-        name: "风向6",
-        value: 1,
-        deg: 10
-    }
-];
 
-const cols = {
-    value: {
-        nice: false,
-        max: 5,
-        min: 0
-    }
-};
-
-const WindDirection: React.FC<{ title: string }> = ({ title }) => {
+const WindDirection: React.FC<{ title: string, xAxias: string, yAxias: string, data: any }> = ({ title, xAxias, yAxias, data }) => {
     return (
         <Card title={title}>
-            <Chart scale={cols} data={dataMock} height={300} forceFit padding="auto">
-                <Axis name="name" />
-                <Axis name="value" />
+            <Chart  data={data} height={300} forceFit padding="auto">
+                <Axis name={xAxias} />
+                <Axis name={yAxias} visible={false} />
                 <Geom
                     type="point"
                     shape="wind"
-                    position="name*value"
+                    position={`${xAxias}*${yAxias}`}
                     color="value"
                     size={40}
-                    tooltip={['name*value*deg', (name, value, deg) => { // array
-                        return {
-                            name: `风力${value}`,
-                            value: `风向${deg}`
-                        }
-                    }]}
                 />
                 <Tooltip />
                 <Geom
                     type="line"
-                    position="name*value"
-                    tooltip={['name*value*deg', (name, value, deg) => { // array
+                    position={`${xAxias}*${yAxias}`}
+                    tooltip={[`${xAxias}*${yAxias}`, (xAxias, yAxias) => { // array
                         return {
-                            name: `风力${value}`,
-                            value: `风向${deg}`
+                            name: `${title}`,
+                            value: yAxias
                         }
                     }]}
                 />

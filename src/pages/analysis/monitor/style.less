@@ -19,3 +19,26 @@
     height: auto;
   }
 }
+
+.empty {
+  :global{
+    .ant-empty {
+      position: relative;
+    }
+    .ant-empty .ant-empty-image {
+      height: 100px;
+      position: absolute;
+      left: 50%;
+      top: 30%;
+      transform: translate(-50%,-50%);
+    }
+    .ant-empty .ant-empty-description {
+      position: absolute;
+      transform: translate(-50%,-50%);
+      left: 50%;
+      top: 45%;
+      height: 20px;
+      width: 300px;
+    }
+  }
+}
