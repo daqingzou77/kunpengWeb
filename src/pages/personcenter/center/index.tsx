@@ -13,6 +13,7 @@ import { FormComponentProps } from '@ant-design/compatible/es/form';
 import { PageHeaderWrapper } from '@ant-design/pro-layout';
 import { uploadRecord } from './service';
 import { connect } from 'dva';
+import moment from 'moment';
 
 const FormItem = Form.Item;
 const { TextArea } = Input;
@@ -41,8 +42,8 @@ class BasicForm extends Component<BasicFormProps> {
         const req = {
           oper_name,
           oper_type: oper_type.join(','),
-          start_time: date[0],
-          end_time: date[1],
+          start_time: moment(date[0]).valueOf().toString(),
+          end_time: moment(date[1]).valueOf().toString(),
           info
         }
         const resp = await uploadRecord(req);

@@ -1,38 +1,19 @@
-import request from '@/utils/request';
-import { TableListParams } from './data';
+import { request as http } from '@/utils/requestCloud';
+import { AxiosRequestConfig } from 'axios';
 
-export async function queryRule(params?: TableListParams) {
-  return request('/api/rule', {
-    params,
-  });
+interface respType {
+  code?: string,
+  msg?: string,
+  data?: []
 }
 
-export async function removeRule(params: { key: number[] }) {
-  return request('/api/rule', {
-    method: 'POST',
-    data: {
-      ...params,
-      method: 'delete',
-    },
-  });
-}
-
-export async function addRule(params: TableListParams) {
-  return request('/api/rule', {
-    method: 'POST',
-    data: {
-      ...params,
-      method: 'post',
-    },
-  });
-}
-
-export async function updateRule(params: TableListParams) {
-  return request('/api/rule', {
-    method: 'POST',
-    data: {
-      ...params,
-      method: 'update',
-    },
-  });
+export function checkInfo(data: {}): Promise<respType> {
+  const opt: AxiosRequestConfig = {
+    url:`/api/`,
+    method: 'get',
+    params:{},
+    data:{}
+  }
+  
+  return http<respType>
 }

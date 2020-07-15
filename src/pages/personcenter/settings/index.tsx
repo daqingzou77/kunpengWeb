@@ -1,33 +1,22 @@
 import React, { Component } from 'react';
 import { Dispatch } from 'redux';
 import { GridContent, PageHeaderWrapper } from '@ant-design/pro-layout';
-import { Menu, Row, Col, Card, Icon } from 'antd';
+import { Row, Col, Card, Icon } from 'antd';
 import BaseView from './components/base';
-import BindingView from './components/binding';
-import { CurrentUser } from './data';
-import NotificationView from './components/notification';
-import SecurityView from './components/security';
 import { getLoginUser, getAvatar } from './service';
 import styles from './style.less';
-import { string } from 'prop-types';
-
-const { Item } = Menu; // 头像组件 方便以后独立，增加裁剪之类的功能
-
 
 interface SettingsProps {
   dispatch: Dispatch<any>;
-  currentUser: CurrentUser;
 }
 
-
-type SettingsStateKeys = 'base' | 'security' | 'binding' | 'notification';
 interface SettingsState {
-  mode: 'inline' | 'horizontal';
-  menuMap: {
-    [key: string]: React.ReactNode;
-  };
-  selectKey: SettingsStateKeys;
-  avatar: 'https://gw.alipayobjects.com/zos/rmsportal/BiazfanxmamNRoxxVxka.png';
+  avatar: string,
+  username: string,
+  signature: string,
+  email: string,
+  phone: string,
+  address: string
 }
 
 class Settings extends Component<SettingsProps, SettingsState> {
@@ -35,13 +24,7 @@ class Settings extends Component<SettingsProps, SettingsState> {
 
   constructor(props: SettingsProps) {
     super(props);
-    const menuMap = {
-      base: '个人信息', // 已上传农事数据
-    };
     this.state = {
-      mode: 'inline',
-      menuMap,
-      selectKey: 'base',
       avatar: 'https://gw.alipayobjects.com/zos/rmsportal/BiazfanxmamNRoxxVxka.png',
       username: '',
       signature: '',
@@ -55,12 +38,6 @@ class Settings extends Component<SettingsProps, SettingsState> {
   componentDidMount() {
     this.getUser();
     this.getAvatarUrl();
-    window.addEventListener('resize', this.resize);
-    this.resize();
-  }
-
-  componentWillUnmount() {
-    window.removeEventListener('resize', this.resize);
   }
 
   getAvatarUrl = async () => {
@@ -85,74 +62,12 @@ class Settings extends Component<SettingsProps, SettingsState> {
     }
   }
 
-  getMenu = () => {
-    const { menuMap } = this.state;
-    return Object.keys(menuMap).map((item) => <Item key={item}>{menuMap[item]}</Item>);
-  };
-
-  getRightTitle = () => {
-    const { selectKey, menuMap } = this.state;
-    return menuMap[selectKey];
-  };
-
-  selectKey = (key: SettingsStateKeys) => {
-    this.setState({
-      selectKey: key,
-    });
-  };
-
-  resize = () => {
-    if (!this.main) {
-      return;
-    }
-
-    requestAnimationFrame(() => {
-      if (!this.main) {
-        return;
-      }
-
-      let mode: 'inline' | 'horizontal' = 'inline';
-      const { offsetWidth } = this.main;
-
-      if (this.main.offsetWidth < 641 && offsetWidth > 400) {
-        mode = 'horizontal';
-      }
-
-      if (window.innerWidth < 768 && offsetWidth > 400) {
-        mode = 'horizontal';
-      }
-
-      this.setState({
-        mode,
-      });
-    });
-  };
-
   renderChildren = () => {
-    const { selectKey } = this.state;
-
-    switch (selectKey) {
-      case 'base':
-        return <BaseView />;
-
-      case 'security':
-        return <SecurityView />;
-
-      case 'binding':
-        return <BindingView />;
-
-      case 'notification':
-        return <NotificationView />;
-
-      default:
-        break;
-    }
-
-    return null;
+    return <BaseView />;
   };
 
   render() {
-  const { username, signature, phone, email, address, avatar } = this.state;
+    const { username, signature, phone, email, address, avatar } = this.state;
 
     return (
       <PageHeaderWrapper>
@@ -187,18 +102,30 @@ class Settings extends Component<SettingsProps, SettingsState> {
                         条农事记录
                       </div>
                     </p>
-                    <p>
-                      <Icon type="phone" />
-                      {phone}
-                    </p>
-                    <p>
-                      <Icon type="mail" />
-                      {email}
-                    </p>
-                    <p>
-                      <Icon type="bank" />
-                      {address}
-                    </p>
+                    {
+                      phone ? (
+                        <p>
+                          <Icon type="phone" />
+                          {phone}
+                        </p>
+                      ) : ''
+                    }
+                    {
+                      email ? (
+                        <p>
+                          <Icon type="mail" />
+                          {email}
+                        </p>
+                      ) : ''
+                    }
+                    {
+                      address ? (
+                        <p>
+                          <Icon type="bank" />
+                          {address}
+                        </p>
+                      ) : ''
+                    }
                   </div>
                 </div>
               </Card>

@@ -9,7 +9,6 @@ if (Shape.registerShape) {
             cfg.points = this.parsePoints(cfg.points);
             const coord = this._coord;
             const { windDirection } = cfg.origin._origin;
-            console.log(cfg)
             container.addShape('line', {
                 attrs: {
                     x1: cfg.points[0].x,
@@ -36,11 +35,16 @@ if (Shape.registerShape) {
     });
 }
 
+const scols = {
+    windDirection: {
+        range: [0, 1]
+    }
+}
 
-const WindDirection: React.FC<{ title: string, xAxias: string, yAxias: string, data: any }> = ({ title, xAxias, yAxias, data }) => {
+const WindDirections: React.FC<{ title: string, xAxias: string, yAxias: string, data: any }> = ({ title, xAxias, yAxias, data }) => {
     return (
         <Card title={title}>
-            <Chart  data={data} height={300} forceFit padding="auto">
+            <Chart  data={data} height={300} scale={scols} forceFit padding="auto">
                 <Axis name={xAxias} />
                 <Axis name={yAxias} visible={false} />
                 <Geom
@@ -48,9 +52,10 @@ const WindDirection: React.FC<{ title: string, xAxias: string, yAxias: string, d
                     shape="wind"
                     position={`${xAxias}*${yAxias}`}
                     color="value"
-                    size={40}
+                    size={14}
+                    tooltip={false}
                 />
-                <Tooltip />
+              <Tooltip />
                 <Geom
                     type="line"
                     position={`${xAxias}*${yAxias}`}
@@ -66,4 +71,4 @@ const WindDirection: React.FC<{ title: string, xAxias: string, yAxias: string, d
     )
 }
 
-export default WindDirection;
+export default WindDirections;

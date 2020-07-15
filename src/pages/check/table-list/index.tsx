@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Form } from '@ant-design/compatible';
 import moment from 'moment';
 import '@ant-design/compatible/assets/index.css';
@@ -9,6 +9,7 @@ const { Paragraph,  } = Typography;
 
 const TableList: React.FC<TableListProps> = () => {
 
+  const [loading, changeLoading] = useState<boolean>(false);
 
   const mainSearch = (
     <div style={{ textAlign: 'center' }}>
@@ -16,13 +17,20 @@ const TableList: React.FC<TableListProps> = () => {
         placeholder="请输入需要校验的哈希值"
         enterButton="搜索"
         size="large"
-        onSearch={() => {
-        }}
+        loading={loading}
+        onSearch={val => handleOnSearch(val)}
         style={{ maxWidth: 400, width: '100%' }}
       />
     </div>
   );
 
+  const handleOnSearch = value => {
+    changeLoading(true);
+    setTimeout(() => {
+     changeLoading(false);
+    }, 1000)
+  }
+  
 
   return (
     <PageHeaderWrapper

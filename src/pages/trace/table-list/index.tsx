@@ -1,14 +1,13 @@
 import React, { Dispatch } from 'react';
+import { RouteChildrenProps } from 'react-router';
 import moment from 'moment';
 import '@ant-design/compatible/assets/index.css';
 import { Input, DatePicker, Tabs, Card, Table, Pagination, List, Typography, message } from 'antd';
 import { PageHeaderWrapper } from '@ant-design/pro-layout';
 import TimelineChart from '../../welcome/components/Charts/TimelineChart';
 import styles from './styles.less';
-import { RouteChildrenProps } from 'react-router';
 import { StateType } from './model';
 import { connect } from 'dva';
-import { Base64 } from './utils/bast64';
 import {
   formDataTrace,
   picTrace,
@@ -131,25 +130,31 @@ class Trace extends React.PureComponent<CenterProps> {
 
   columns = [
     {
-      title: '哈希值',
-      dataIndex: 'hash',
+      title: '操作名称',
+      dataIndex: 'oper_name',
       align: 'center'
     },
     {
-      title: '时间',
+      title: '哈希值',
+      dataIndex: 'tx_id',
+      align: 'center'
+    },
+    {
+      title: '操作时间',
       dataIndex: 'time',
-      defaultSortOrder: 'descend',
-      sorter: (a, b) => new Date(a.time).getTime() - new Date(b.time).getTime(),
+      render: (_, record) => {
+       return `${moment(Number(record.start_time)).format('YYYY-MM-DD hh:mm:ss')}-${moment(Number(record.end_time)).format('YYYY-MM-DD hh:mm:ss')}`
+      },
       align: 'center'
     },
     {
       title: '操作人',
-      dataIndex: 'conductor',
+      dataIndex: 'name',
       align: 'center'
     },
     {
       title: '操作行为',
-      dataIndex: 'operation',
+      dataIndex: 'oper_type',
       align: 'center'
     },
   ]
@@ -164,9 +169,6 @@ class Trace extends React.PureComponent<CenterProps> {
     dataSource: []
   }
 
-  componentDidMount() {
-
-  }
 
   //  处理日期组件变化
   handleRangerPicker = (time: any) => {
@@ -200,24 +202,39 @@ class Trace extends React.PureComponent<CenterProps> {
       return;
     }
     const params = {
-      start_time: moment(startTime).valueOf(),
-      end_time: moment(endTime).valueOf(),
+      start_time: moment(startTime).valueOf().toString(),
+      end_time: moment(endTime).valueOf().toString(),
       point: val
     }
     if (tabKey === '1') {
-      this.handleFormDataTrace(params);
+      this.handleSensorTrace(params);
     } else if (tabKey === '2') {
       this.handlePicTrace(params);
     } else if (tabKey === '3') {
-      this.handleSensorTrace(params);
+      this.handleFormDataTrace(params);
     }
   }
 
   // 农事数据溯源
   handleFormDataTrace = async data => {
     const resp = await formDataTrace(data);
+    const dataArray: Array<any> = [];
     if (resp.msg === 'ok') {
-      console.log(Base64.decode(resp.data))
+      const parseData = JSON.parse(resp.data);
+      parseData.map(item => {
+        const { k, t, v } = item;
+        const name = k.split('~')[1];
+        const tx_id = t;
+        dataArray.push({
+          name,
+          tx_id,
+          ...v
+        })
+      })
+      this.setState({
+        loading: false,
+        dataSource: dataArray
+      })
     }
   }
 
@@ -225,7 +242,9 @@ class Trace extends React.PureComponent<CenterProps> {
   handlePicTrace = async data => {
     const resp = await sensorTrace(data);
     if (resp.msg === 'ok') {
-      console.log(Base64.decode(resp.data))
+      this.setState({
+        loading: false
+      })
     }
   }
 
@@ -233,12 +252,14 @@ class Trace extends React.PureComponent<CenterProps> {
   handleSensorTrace = async data => {
     const resp = await (data);
     if (resp.msg === 'ok') {
-      console.log(Base64.decode(resp.data))
+      this.setState({
+        loading: false
+      })
     }
   }
 
   render() {
-    const { loading, tabKey } = this.state;
+    const { loading, tabKey, dataSource } = this.state;
     const mainSearch = (
       <div style={{ textAlign: 'center' }}>
         <RangePicker
@@ -293,7 +314,7 @@ class Trace extends React.PureComponent<CenterProps> {
             {/* 农事管理数据 */}
             <TabPane tab="农事管理数据" key="3">
               <Table
-                expandedRowRender={record => <p><span style={{ fontWeight: 'bold' }}>详细信息：</span>{record.description}</p>}
+                expandedRowRender={record => <p><span style={{ fontWeight: 'bold' }}>详细信息：</span>{record.info}</p>}
                 columns={this.columns}
                 dataSource={dataSource}
               />
