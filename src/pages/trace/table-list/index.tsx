@@ -6,11 +6,15 @@ import { PageHeaderWrapper } from '@ant-design/pro-layout';
 import TimelineChart from '../../welcome/components/Charts/TimelineChart';
 import styles from './styles.less';
 import { RouteChildrenProps } from 'react-router';
-import { SensorData } from './data';
 import { StateType } from './model';
-
 import { connect } from 'dva';
-import SensorCharts from './components/SensorChart';
+import { Base64 } from './utils/bast64';
+import {
+  formDataTrace,
+  picTrace,
+  sensorTrace
+} from './service';
+
 
 const { RangePicker } = DatePicker;
 const { TabPane } = Tabs;
@@ -150,51 +154,91 @@ class Trace extends React.PureComponent<CenterProps> {
     },
   ]
 
-   state = {
-     startTime: '',
-     endTime: '',
-   }
+  state = {
+    startTime: '',
+    endTime: '',
+    loading: false,
+    tabKey: '1',
+    farmData: [],
+    picList: [],
+    dataSource: []
+  }
 
   componentDidMount() {
 
   }
 
   //  处理日期组件变化
-  handleRangerPicker = time => {
-     if (time !== undefined) {
+  handleRangerPicker = (time: any) => {
+    if (time !== undefined) {
       this.setState({
         startTime: time[0],
         endTime: time[1]
       })
-     }
+    }
+  }
+
+  // 处理tab
+  handleChange = (val: any) => {
+    this.setState({
+      tabKey: val
+    })
   }
 
   // 处理输入框
-  handleInputChange = val => {
-    const { dispatch } = this.props;
-    const { startTime, endTime } = this.state; 
+  handleInputChange = async val => {
+    const { startTime, endTime, tabKey } = this.state;
+    this.setState({
+      loading: true
+    })
     if (!startTime || !endTime) {
       message.warning('请选择时间');
       return;
     }
     if (!val) {
-      message.warning('请输入园林采集点');
+      message.warning('请输入上传数据的用户名');
       return;
     }
     const params = {
-      startTime,
-      endTime,
-      collecetPoint: val
+      start_time: moment(startTime).valueOf(),
+      end_time: moment(endTime).valueOf(),
+      point: val
     }
-    dispatch({
-      type: 'trace/queryByConditions',
-      payload: params
-    })
+    if (tabKey === '1') {
+      this.handleFormDataTrace(params);
+    } else if (tabKey === '2') {
+      this.handlePicTrace(params);
+    } else if (tabKey === '3') {
+      this.handleSensorTrace(params);
+    }
   }
 
+  // 农事数据溯源
+  handleFormDataTrace = async data => {
+    const resp = await formDataTrace(data);
+    if (resp.msg === 'ok') {
+      console.log(Base64.decode(resp.data))
+    }
+  }
+
+  // 图片信息溯源
+  handlePicTrace = async data => {
+    const resp = await sensorTrace(data);
+    if (resp.msg === 'ok') {
+      console.log(Base64.decode(resp.data))
+    }
+  }
+
+  // 传感器数据溯源 
+  handleSensorTrace = async data => {
+    const resp = await (data);
+    if (resp.msg === 'ok') {
+      console.log(Base64.decode(resp.data))
+    }
+  }
 
   render() {
-
+    const { loading, tabKey } = this.state;
     const mainSearch = (
       <div style={{ textAlign: 'center' }}>
         <RangePicker
@@ -205,7 +249,8 @@ class Trace extends React.PureComponent<CenterProps> {
           onChange={time => this.handleRangerPicker(time)}
         />
         <Input.Search
-          placeholder="请输入园林采集点"
+          placeholder="请输入上传用户名"
+          loading={loading}
           enterButton="搜索"
           size="large"
           onSearch={val => this.handleInputChange(val)}
@@ -214,19 +259,13 @@ class Trace extends React.PureComponent<CenterProps> {
       </div>
     );
 
-
     return (
       <PageHeaderWrapper
         title='冬枣信息溯源'
         content={mainSearch}
       >
         <Card>
-          <Tabs defaultActiveKey="1" onChange={() => { }}>
-            {/* 传感器 */}
-            {/* <TabPane tab="传感器mock" key="0">
-              <SensorCharts />
-            </TabPane> */}
-            {/* <SensorChart /> */}
+          <Tabs defaultActiveKey={tabKey} onChange={this.handleChange}>
             {/* 传感器数据统计 */}
             <TabPane tab="传感器数据统计" key="1">
               <TimelineChart

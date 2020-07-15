@@ -1,74 +1,56 @@
-import request from '@/utils/request';
-import { TableListParams, requestParam } from './data.d';
+import { request as http } from '@/utils/requestCloud';
+import { AxiosRequestConfig } from 'axios';
 
-export async function queryRule(params?: TableListParams) {
-  return request('/api/rule', {
-    params,
-  });
+interface respType {
+  code?: string,
+  msg?: string,
+  data?: []
 }
 
-export async function removeRule(params: { key: number[] }) {
-  return request('/api/rule', {
-    method: 'POST',
-    data: {
-      ...params,
-      method: 'delete',
-    },
-  });
+// 农事数据溯源
+export function formDataTrace(data: { start_time: string, end_time: string, point: string }): Promise<respType>{
+  const opt: AxiosRequestConfig = {
+    url:`/api/v1/trace/farmData`,
+    method: 'post',
+    params:{},
+    data:{}
+  }
+  opt.data = {
+    star_time: data.start_time,
+    end_time: data.end_time,
+    point: data.point
+  }
+  return http<respType>(opt)
 }
 
-export async function addRule(params: TableListParams) {
-  return request('/api/rule', {
-    method: 'POST',
-    data: {
-      ...params,
-      method: 'post',
-    },
-  });
+// 图片信息溯源
+export function picTrace(data: { start_time: string, end_time: string, point: string }): Promise<respType> {
+  const opt: AxiosRequestConfig = {
+    url:`/api/v1/trace/picture`,
+    method: 'post',
+    params:{},
+    data:{}
+  }
+  opt.data = {
+    star_time: data.start_time,
+    end_time: data.end_time,
+    point: data.point
+  }
+  return http<respType>(opt)
 }
 
-export async function updateRule(params: TableListParams) {
-  return request('/api/rule', {
-    method: 'POST',
-    data: {
-      ...params,
-      method: 'update',
-    },
-  });
-}
-
-
-export async function getChartData() {
-  return request('/api/offlineChartData');
-}
-
-
-/**
- *  接口测试
- */
-
-// 获取传感器数据
-export async function getSensorData() {
-  return  request('/api/getSensorData');;
-}
-
-// 获取实时图片
-export async function getRealTimePics() {
-  return request('/api/getRealTimePics');
-}
-
-// 获取农事管理数据
-export async function getAgriculturalData() {
-  return request('/api/getAgriculturalData');
-}
-
-// 条件查询园林数据
-export async function getGardenData(params: requestParam) {
-  return request('/api/getGardenData', {
-    method: 'POST',
-    data: {
-      ...params,
-      method: 'post',
-    }
-  })
+// 传感器溯源
+export function sensorTrace(data: { start_time: string, end_time: string, point: string }) : Promise<respType> {
+  const opt: AxiosRequestConfig = {
+    url:`/api/v1/trace/sensor`,
+    method: 'post',
+    params:{},
+    data:{}
+  }
+  opt.data = {
+    star_time: data.start_time,
+    end_time: data.end_time,
+    point: data.point
+  }
+  return http<respType>(opt)
 }

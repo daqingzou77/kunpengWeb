@@ -59,7 +59,7 @@ function divideTime(array: any) {
   return convert(newArray);
 }
 
-class Monitor extends Component<MonitorProps> {
+class Monitor extends Component<{}> {
 
   state = {
     airHumidityList: [],
@@ -120,7 +120,6 @@ class Monitor extends Component<MonitorProps> {
   }
 
   render() {
-    const { dashboardAndmonitor } = this.props;
     const { airHumidityList, airPressureList, illuminanceList, rainfallList, airTemperatureList, windDirectionList, windSpeedList, loading, showEmpty } = this.state;
     const mainSearch = (
       <div style={{ textAlign: 'center' }}>
@@ -213,19 +212,4 @@ class Monitor extends Component<MonitorProps> {
   }
 }
 
-export default connect(
-  ({
-    dashboardAndmonitor,
-    loading,
-  }: {
-    dashboardAndmonitor: StateType;
-    loading: {
-      models: {
-        [key: string]: boolean;
-      };
-    };
-  }) => ({
-    dashboardAndmonitor,
-    loading: loading.models.dashboardAndmonitor,
-  }),
-)(Monitor);
+export default Monitor;
