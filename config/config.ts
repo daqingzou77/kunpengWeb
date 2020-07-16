@@ -77,100 +77,66 @@ export default {
   routes: [
     {
       path: '/',
-      component: '../layouts/BlankLayout',
+      component: '../layouts/BasicLayout',
+      Routes: ['src/pages/Authorized'],
+      authority: ['admin', 'user', 'guest'],
       routes: [
         {
-          path: '/user',
-          component: '../layouts/UserLayout',
+          path: '/welcome',
+          name: '网络监控',
+          icon: 'eye',
+          component: './welcome'
+        },
+        {
+          path: '/analysis',
+          name: '数据分析',
+          icon: 'apartment',
+          component: './analysis/monitor'
+        },
+        {
+          path: '/trace',
+          name: '信息溯源',
+          icon: 'security-scan',
+          component: './trace/table-list'
+        },
+        {
+          path: '/check',
+          icon: 'funnel-plot',
+          name: '链上校验',
+          component: './check/table-list'
+        },
+        {
+          path: '/account',
+          icon: 'user',
+          name: '个人中心',
+          authority: ['guest'],
           routes: [
             {
-              path: '/user',
-              redirect: '/user/login',
-            },
-            {
-              name: 'login',
+              name: '个人信息',
               icon: 'smile',
-              path: '/user/login',
-              component: './user/login',
+              path: '/account/settings',
+              component: './personcenter/settings'
             },
             {
-              name: 'register-result',
-              icon: 'smile',
-              path: '/user/register-result',
-              component: './user/register-result',
-            },
-            {
-              name: 'register',
-              icon: 'smile',
-              path: '/user/register',
-              component: './user/register',
-            },
-            {
-              component: '404',
-            },
-          ],
+              name: '数据记录上传',
+              icon: 'cloud-upload',
+              path: '/account/uploadInfo',
+              component: './personcenter/center'
+            }
+          ]
         },
         {
           path: '/',
-          component: '../layouts/BasicLayout',
-          Routes: ['src/pages/Authorized'],
+          redirect: '/welcome',
           authority: ['admin', 'user'],
-          routes: [
-            {
-                path: '/welcome',
-                name: '网络监控',
-                icon: 'eye',
-                component: './welcome'
-            },
-            {
-              path: '/analysis',
-              name: '数据分析',
-              icon: 'apartment',
-              component: './analysis/monitor'
-            },
-            {
-              path: '/trace',
-              name: '信息溯源',
-              icon: 'security-scan',
-              component: './trace/table-list' 
-            },
-            {
-              path: '/check',
-              icon: 'funnel-plot',
-              name: '链上校验',
-              component: './check/table-list'
-            },
-            {
-              path: '/account',
-              icon: 'user',
-              name: '个人中心',
-              routes: [
-                {
-                  name:'个人信息',
-                  icon: 'smile',
-                  path: '/account/settings',
-                  component: './personcenter/settings'
-                }, 
-                {
-                  name: '数据记录上传',
-                  icon: 'cloud-upload',
-                  path: '/account/uploadInfo',
-                  component: './personcenter/center'
-                }
-              ]
-            },
-            {
-              path: '/',
-              redirect: '/welcome',
-              authority: ['admin', 'user'],
-            },
-            {
-              component: '404',
-            },
-          ],
+        },
+        {
+          component: '404',
         },
       ],
     },
+    // ],
+    // },
   ],
   // Theme for antd: https://ant.design/docs/react/customize-theme-cn
   theme: {
@@ -227,11 +193,13 @@ export default {
   //   },
   // },
   proxy: {
-    '/api/v1': {
-      target: 'http://202.193.60.10'
+    '/api': {
+      target: 'http://202.193.60.108:8000 '
     },
-    '/api/data': {
-      target: 'http://202.193.60.10',
+    '/apiCloud': {
+      target: 'http://202.193.60.10:6667',
+      changeOrigin: true,
+      pathRewrite: { '^/apiCloud': '/api' },
     },
   }
 } as IConfig;

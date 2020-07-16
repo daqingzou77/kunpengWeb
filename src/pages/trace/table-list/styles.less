@@ -7,7 +7,7 @@
   .card {
     :global {
       .ant-card-meta-title {
-        margin-bottom: 4px;
+        margin-bottom: 15px;
         & > a {
           display: inline-block;
           max-width: 100%;
@@ -15,9 +15,13 @@
         }
       }
       .ant-card-meta-description {
-        height: 44px;
+        height: 150px;
         overflow: hidden;
         line-height: 22px;
+      }
+      .ant-typography .ant-typography-ellipsis {
+        display: inline-block;
+        width: 150px;
       }
     }
 
@@ -33,7 +37,7 @@
   .cardItemContent {
     display: flex;
     height: 20px;
-    margin-top: 16px;
+    margin-top: -40px;
     margin-bottom: -4px;
     line-height: 20px;
     & > span {

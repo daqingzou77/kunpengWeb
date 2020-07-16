@@ -14,8 +14,7 @@ import {
 } from './service';
 import styles from './styles.less';
 
-
-
+const { Text, Paragraph } = Typography;
 const { RangePicker } = DatePicker;
 const { TabPane } = Tabs;
 
@@ -136,7 +135,7 @@ class Trace extends React.PureComponent<CenterProps> {
     title: '采集点',
     dataIndex: 'point',
     align: 'center'
-  },{
+  }, {
     title: '文件名',
     dataIndex: 'name',
     align: 'center'
@@ -148,7 +147,7 @@ class Trace extends React.PureComponent<CenterProps> {
     title: '时间戳',
     dataIndex: 'timestamp',
     align: 'center'
-  },{
+  }, {
     title: '传感器类型',
     dataIndex: 'type',
     align: 'center'
@@ -319,15 +318,15 @@ class Trace extends React.PureComponent<CenterProps> {
             <Card
               className={styles.card}
               hoverable
-              cover={<img alt='采集图片' src={require(`../../../../public/images/pic${(index % 3) + 1}.jpg`)} height={124} width={207} />}
+              cover={<img alt='采集图片' src={`http://202.193.60.10/${item.point}/${moment(new Date(Number(item.timestamp))).format('YYYY/MM/DD')}/${item.name}.jpg`} height={124} width={207} />}
             >
               <Card.Meta
                 title={<span>传感器类型：{item.type}</span>}
                 description={
                   <>
-                    <Typography.Text copyable ellipsis>图片哈希：{item.name}</Typography.Text>
-                    <Typography.Text copyable ellipsis>区块存证哈希：{item.tx_id}</Typography.Text>
-                    <Typography.Text>采集点：{item.point}</Typography.Text>
+                    <Paragraph>图片哈希：<Text ellipsis copyable>{item.name}</Text></Paragraph>
+                    <Paragraph>区块存证哈希：<Text ellipsis copyable>{item.tx_id}</Text></Paragraph>
+                    <Paragraph>采集点：<Text>{item.point}</Text></Paragraph>
                   </>
                 }
               />
@@ -348,7 +347,7 @@ class Trace extends React.PureComponent<CenterProps> {
           <Tabs defaultActiveKey={tabKey} onChange={this.handleChange}>
             {/* 传感器数据统计 */}
             <TabPane tab="传感器数据统计" key="1">
-              <Table 
+              <Table
                 columns={this.sensorCloumns}
                 dataSource={sensorData}
               />

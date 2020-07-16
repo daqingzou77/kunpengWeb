@@ -5,12 +5,11 @@ import { Button, Input, Select, Upload, message } from 'antd';
 import React, { Component, Fragment } from 'react';
 import { FormComponentProps } from '@ant-design/compatible/es/form';
 import { connect } from 'dva';
-import { getAvatar, getLoginUser, updateLoginUser } from '../service';
+import { updateLoginUser } from '../service';
 import { CurrentUser } from '../data';
 import styles from './BaseView.less';
 
 const FormItem = Form.Item;
-const { Option } = Select; // 头像组件 方便以后独立，增加裁剪之类的功能
 
 interface SelectItem {
   label: string;
@@ -41,23 +40,17 @@ function getBase64(img: any, callback: any) {
 class BaseView extends Component<BaseViewProps> {
   view: HTMLDivElement | undefined = undefined;
 
-  state = {
-  }
-
-
-  getViewDom = (ref: HTMLDivElement) => {
-    this.view = ref;
-  };
-
   handlerSubmit = (event: React.MouseEvent) => {
     event.preventDefault();
-    const { form } = this.props;
+    const { form, getUser } = this.props;
     form.validateFields(async (err, values) => {
       if (!err) {
         const { address, email, phone } = values;
-        const resp = await updateLoginUser({address, email,phone});
-        console.log(resp);
-        message.success('更新基本信息成功');
+        const resp = await updateLoginUser({ address, email, phone });
+        if (resp.msg === 'ok') {
+          message.success('更新基本信息成功');
+        }
+        getUser()
       }
     });
   };
@@ -77,8 +70,9 @@ class BaseView extends Component<BaseViewProps> {
 
   handleChange = (info: any) => {
     if (info.file.status === 'done') {
-      getBase64(info.file.originFileObj, (imageUrl: string) =>
-       this.props.setAvatar(imageUrl)
+      getBase64(info.file.originFileObj, (imageUrl: string) => {
+        this.props.setAvatar(imageUrl)
+      }
       );
       message.success('头像更换成功')
     }
@@ -87,34 +81,11 @@ class BaseView extends Component<BaseViewProps> {
   render() {
     const {
       form: { getFieldDecorator },
-      data: { username, phone, email, address, avatar }
+      data: { username, phone, email, address, records, avatar }
     } = this.props;
     const token = localStorage.getItem('token');
-    // 更换头像组件
-    const AvatarView = ({ avatar }: { avatar: string }) => (
-      <Fragment>
-        <div className={styles.avatar_title}>头像</div>
-        <div className={styles.avatar}>
-          <img src={avatar} alt="avatar" width={144} height={144} style={{ borderRadius: '50%' }} />
-        </div>
-        <Upload
-          action='/api/v1/user/setHeader'
-          showUploadList={false}
-          beforeUpload={file => this.handleBefore(file)}
-          onChange={this.handleChange}
-          headers={{ Authorization: token }}
-        >
-          <div className={styles.button_view}>
-            <Button>
-              <UploadOutlined />
-              更换头像
-            </Button>
-          </div>
-        </Upload>
-      </Fragment>
-    );
     return (
-      <div className={styles.baseView} ref={this.getViewDom}>
+      <div className={styles.baseView} >
         <div className={styles.left}>
           <Form layout="vertical" hideRequiredMark autoComplete="off">
             <FormItem label="用户名">
@@ -141,9 +112,10 @@ class BaseView extends Component<BaseViewProps> {
             </FormItem>
 
             <FormItem label="已上传农事记录数据条数">
-              {getFieldDecorator('uploadedItems', {
+              {getFieldDecorator('records', {
                 rules: [
                 ],
+                initialValue: records
               })(<Input disabled />)}
             </FormItem>
             <FormItem label="联系电话">
@@ -189,7 +161,26 @@ class BaseView extends Component<BaseViewProps> {
           </Form>
         </div>
         <div className={styles.right}>
-          <AvatarView avatar={avatar} />
+          <Fragment>
+            <div className={styles.avatar_title}>头像</div>
+            <div className={styles.avatar}>
+              <img src={avatar} alt="avatar" width={144} height={144} style={{ borderRadius: '50%' }} />
+            </div>
+            <Upload
+              action='/api/v1/user/setHeader'
+              showUploadList={false}
+              beforeUpload={file => this.handleBefore(file)}
+              onChange={this.handleChange}
+              headers={{ Authorization: token }}
+            >
+              <div className={styles.button_view}>
+                <Button>
+                  <UploadOutlined />
+              更换头像
+            </Button>
+              </div>
+            </Upload>
+          </Fragment>
         </div>
       </div>
     );

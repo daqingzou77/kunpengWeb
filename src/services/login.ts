@@ -48,3 +48,14 @@ export function userLogout(): Promise<responseData> {
   }
   return http<responseData>(opt)
 }
+
+// 获取用户头像
+export function getAvatar(): Promise<responseData> {
+  const opt: AxiosRequestConfig = {
+    url:`/api/v1/user/getHeader`,
+    method: 'get',
+    params:{},
+    data:{}
+  }
+  return http<responseData>(opt)
+}

@@ -72,26 +72,6 @@ class BaseView extends Component<BaseViewProps> {
     imageUrl: 'https://gw.alipayobjects.com/zos/rmsportal/BiazfanxmamNRoxxVxka.png'
    }
 
-  componentDidMount() {
-    this.setBaseInfo();
-  }
-
-  setBaseInfo = () => {
-    const { currentUser, form } = this.props;
-
-    if (currentUser) {
-      Object.keys(form.getFieldsValue()).forEach((key) => {
-        const obj = {};
-        obj[key] = currentUser[key] || null;
-        form.setFieldsValue(obj);
-      });
-    }
-  };
-
-  getViewDom = (ref: HTMLDivElement) => {
-    this.view = ref;
-  };
-
   handlerSubmit = (event: React.MouseEvent) => {
     event.preventDefault();
     const { form } = this.props;

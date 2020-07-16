@@ -45,3 +45,14 @@ export function updateLoginUser(data:{ address?:string, email?: string, phone?: 
   }
   return http<responseData>(opt)
 }
+
+// 已上传农事数据查询
+export function getuploadRecords(): Promise<responseData> {
+  const opt: AxiosRequestConfig = {
+    url:`/api/v1/user/getRecords`,
+    method: 'get',
+    params:{},
+    data:{}
+  }
+  return http<responseData>(opt)
+}

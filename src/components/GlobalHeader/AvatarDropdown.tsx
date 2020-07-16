@@ -7,7 +7,8 @@ import { router } from 'umi';
 import { ConnectProps } from '@/models/connect';
 import { CurrentUser } from '@/models/user';
 import HeaderDropdown from '../HeaderDropdown';
-import { userLogin, userRigester, userLogout } from '@/services/login';
+import { userLogin, userRigester, getAvatar } from '@/services/login';
+import { setAuthority } from '@/utils/authority'
 import styles from './index.less';
 
 export interface GlobalHeaderRightProps extends ConnectProps {
@@ -20,7 +21,17 @@ class AvatarDropdown extends React.Component<GlobalHeaderRightProps> {
   state = {
     modalVisible: false,
     loginModalVisible: false,
-    loading: false
+    loading: false,
+    avatar: ''
+  }
+
+  getAvatarUrl = async () => {
+    const resp = await getAvatar();
+    if (resp.msg === 'ok') {
+      this.setState({
+        avatar: `http://202.193.60.112:8000/header/${resp.data}`
+      })
+    }
   }
 
   onMenuClick = (event: ClickParam) => {
@@ -78,6 +89,7 @@ class AvatarDropdown extends React.Component<GlobalHeaderRightProps> {
   handleLogout = async () => {
     localStorage.removeItem('token');
     localStorage.removeItem('currentUser');
+    setAuthority('')
     window.location.reload()
   }
 
@@ -95,6 +107,9 @@ class AvatarDropdown extends React.Component<GlobalHeaderRightProps> {
           currentUser: username
         })
         message.success('用户登录成功')
+        setAuthority('guest')
+        this.getAvatarUrl();
+        router.push('/welcome')
       } else {
         message.error('用户登录失败');
       }
@@ -130,7 +145,7 @@ class AvatarDropdown extends React.Component<GlobalHeaderRightProps> {
 
   render(): React.ReactNode {
     const { menu } = this.props;
-    const { modalVisible, loginModalVisible, loading } = this.state;
+    const { modalVisible, loginModalVisible, loading, avatar } = this.state;
     const currentUser = localStorage.getItem('currentUser');
     console.log('currentUser', currentUser)
     const { getFieldDecorator } = this.props.form;
@@ -168,7 +183,7 @@ class AvatarDropdown extends React.Component<GlobalHeaderRightProps> {
           <HeaderDropdown overlay={menuHeaderDropdown}>
             <span>
               <span className={`${styles.action} ${styles.account}`}>
-                <Avatar size="small" className={styles.avatar} alt="avatar" src="https://gw.alipayobjects.com/zos/antfincdn/XAosXuNZyF/BiazfanxmamNRoxxVxka.png" />
+                <Avatar size="small" className={styles.avatar} alt="avatar" src={avatar} />
                 <span className={styles.name}>{currentUser}</span>
               </span>
             </span>
