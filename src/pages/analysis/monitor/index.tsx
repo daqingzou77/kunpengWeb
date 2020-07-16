@@ -1,4 +1,4 @@
-import { Col, Row, DatePicker, Button, Empty } from 'antd';
+import { Col, Row, DatePicker, Button, Empty, message } from 'antd';
 import React, { Component } from 'react';
 import { Dispatch } from 'redux';
 import { GridContent } from '@ant-design/pro-layout';
@@ -96,7 +96,11 @@ class Monitor extends Component<{}> {
       loading: true
     })
     setTimeout(async () => {
+      var d = new Date();
+      var s = d.getTime();
       const resp = await getSensors(data);
+      d = new Date();
+      message.info(`时间花费${d.getTime()-s}ms`);
       if (Object.prototype.toString.call(resp) === '[object Array]' && resp.length > 0) {
         const newData = divideTime(resp);
         const { airHumidityList, airPressureList, illuminanceList, rainfallList, airTemperatureList, windDirectionList, windSpeedList } = newData;
@@ -110,6 +114,8 @@ class Monitor extends Component<{}> {
           windSpeedList,
           showEmpty: false
         })
+      } else {
+        this.setState({showEmpty: true})
       }
       this.setState({
         loading: false
