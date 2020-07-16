@@ -6,14 +6,14 @@ interface respType {
   msg?: string,
   data?: []
 }
-
-export function checkInfo(data: {}): Promise<respType> {
+export function checkInfo(data: { hash: string }): Promise<respType> {
   const opt: AxiosRequestConfig = {
-    url:`/api/`,
-    method: 'get',
+    url:`/api/v1/trace/verify`,
+    method: 'post',
     params:{},
     data:{}
   }
-  
-  return http<respType>
+  opt.data.hash = data.hash;
+  return http<respType>(opt)
 }
+

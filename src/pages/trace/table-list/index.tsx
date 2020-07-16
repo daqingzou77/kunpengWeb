@@ -130,14 +130,36 @@ class Trace extends React.PureComponent<CenterProps> {
       dataIndex: 'oper_type',
       align: 'center'
     },
-  ]
+  ];
+
+  sensorCloumns = [{
+    title: '采集点',
+    dataIndex: 'point',
+    align: 'center'
+  },{
+    title: '文件名',
+    dataIndex: 'name',
+    align: 'center'
+  }, {
+    title: '区块哈希',
+    dataIndex: 'tx_id',
+    align: 'center'
+  }, {
+    title: '时间戳',
+    dataIndex: 'timestamp',
+    align: 'center'
+  },{
+    title: '传感器类型',
+    dataIndex: 'type',
+    align: 'center'
+  }]
 
   state = {
     startTime: '',
     endTime: '',
     loading: false,
     tabKey: '1',
-    farmData: [],
+    sensorData: [],
     picList: [],
     dataSource: []
   }
@@ -163,17 +185,21 @@ class Trace extends React.PureComponent<CenterProps> {
   // 处理输入框
   handleInputChange = async val => {
     const { startTime, endTime, tabKey } = this.state;
-    this.setState({
-      loading: true
-    })
     if (!startTime || !endTime) {
       message.warning('请选择时间');
       return;
     }
     if (!val) {
-      message.warning('请输入上传数据的用户名');
+      if (tabKey === '3') {
+        message.warning('请输入上传数据的用户名');
+      } else {
+        message.warning('请输入采集点');
+      }
       return;
     }
+    this.setState({
+      loading: true
+    })
     const params = {
       start_time: moment(startTime).valueOf().toString(),
       end_time: moment(endTime).valueOf().toString(),
@@ -239,7 +265,22 @@ class Trace extends React.PureComponent<CenterProps> {
   // 传感器数据溯源 
   handleSensorTrace = async data => {
     const resp = await sensorTrace(data);
+    const sensorArray: Array<any> = [];
     if (resp.msg === 'ok') {
+      const parseData = JSON.parse(resp.data);
+      parseData.map(item => {
+        const { k, t, v } = item;
+        const timestamp = k.split('~')[2].substring(0, 13);
+        const tx_id = t;
+        sensorArray.push({
+          timestamp,
+          tx_id,
+          ...v
+        })
+        this.setState({
+          sensorData: sensorArray
+        })
+      })
       this.setState({
         loading: false
       })
@@ -247,7 +288,7 @@ class Trace extends React.PureComponent<CenterProps> {
   }
 
   render() {
-    const { loading, tabKey, dataSource, picList } = this.state;
+    const { loading, tabKey, sensorData, dataSource, picList } = this.state;
     const mainSearch = (
       <div style={{ textAlign: 'center' }}>
         <RangePicker
@@ -258,7 +299,7 @@ class Trace extends React.PureComponent<CenterProps> {
           onChange={time => this.handleRangerPicker(time)}
         />
         <Input.Search
-          placeholder="请输入上传用户名"
+          placeholder={tabKey === '3' ? '请输入上传用户名' : '请输入采集点'}
           loading={loading}
           enterButton="搜索"
           size="large"
@@ -267,15 +308,7 @@ class Trace extends React.PureComponent<CenterProps> {
         />
       </div>
     );
-    // name: "b9c52e66c1ebfc826e324a394a106f9dc9550fed4390808b2d8932ff91c92b5a"
-    // point: "point001"
-    // size: "1024"
-    // timestamp: "1594815385165736041"
-    // tx_id: "45cac0331d35f6f0c471d1e63cb6ba012cef2d8de0fec28f033384e56f58c768"
-    // type: "sensor"
-    console.log(picList)
 
-    //  模拟图片数据来源
     const cardList = (
       <List
         rowKey="id"
@@ -315,7 +348,11 @@ class Trace extends React.PureComponent<CenterProps> {
           <Tabs defaultActiveKey={tabKey} onChange={this.handleChange}>
             {/* 传感器数据统计 */}
             <TabPane tab="传感器数据统计" key="1">
-              <TimelineChart
+              <Table 
+                columns={this.sensorCloumns}
+                dataSource={sensorData}
+              />
+              {/* <TimelineChart
                 height={400}
                 data={offlineChartData}
                 titleMap={{
@@ -324,7 +361,7 @@ class Trace extends React.PureComponent<CenterProps> {
                   y3: '传感器3',
                   y4: '传感器4'
                 }}
-              />
+              /> */}
             </TabPane>
             {/* 实时采集图片 */}
             <TabPane tab="实时采集图片" key="2">
