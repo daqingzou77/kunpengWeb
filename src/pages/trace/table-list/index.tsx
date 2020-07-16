@@ -1,18 +1,19 @@
 import React, { Dispatch } from 'react';
 import { RouteChildrenProps } from 'react-router';
 import moment from 'moment';
+import { connect } from 'dva';
 import '@ant-design/compatible/assets/index.css';
 import { Input, DatePicker, Tabs, Card, Table, Pagination, List, Typography, message } from 'antd';
 import { PageHeaderWrapper } from '@ant-design/pro-layout';
 import TimelineChart from '../../welcome/components/Charts/TimelineChart';
-import styles from './styles.less';
 import { StateType } from './model';
-import { connect } from 'dva';
 import {
   formDataTrace,
   picTrace,
   sensorTrace
 } from './service';
+import styles from './styles.less';
+
 
 
 const { RangePicker } = DatePicker;
@@ -45,7 +46,7 @@ const desc = [
 
 
 const list = [];
-for (let i = 0; i < 8; i += 1) {
+for (let i = 0; i < 2; i += 1) {
   list.push({
     id: `fake-list-${i}`,
     title: titles[i % 8],
@@ -54,34 +55,6 @@ for (let i = 0; i < 8; i += 1) {
     subDescription: desc[i % 5],
   });
 }
-
-//  模拟图片数据来源
-const cardList = (
-  <List
-    rowKey="id"
-    grid={{ gutter: 24, xl: 4, lg: 3, md: 3, sm: 2, xs: 1 }}
-    dataSource={list}
-    renderItem={(item, index) => (
-      <List.Item>
-        <Card
-          className={styles.card}
-          hoverable
-          cover={<img alt={item.title} src={require(`../../../../public/images/pic${(index % 3) + 1}.jpg`)} height={124} width={207} />}
-        >
-          <Card.Meta
-            title='存证哈希'
-            description={
-              <Typography.Text copyable ellipsis>{item.subDescription}</Typography.Text>
-            }
-          />
-          <div className={styles.cardItemContent}>
-            <span>图片时刻：{moment(item.updatedAt).format('YYYY/MM/DD hh:mm:ss')}</span>
-          </div>
-        </Card>
-      </List.Item>
-    )}
-  />
-)
 
 
 const offlineChartData: { x: number; y1: number; y2: number; y3: number; y4: number; }[] = [];
@@ -143,7 +116,7 @@ class Trace extends React.PureComponent<CenterProps> {
       title: '操作时间',
       dataIndex: 'time',
       render: (_, record) => {
-       return `${moment(Number(record.start_time)).format('YYYY-MM-DD hh:mm:ss')}-${moment(Number(record.end_time)).format('YYYY-MM-DD hh:mm:ss')}`
+        return `${moment(Number(record.start_time)).format('YYYY-MM-DD hh:mm:ss')}-${moment(Number(record.end_time)).format('YYYY-MM-DD hh:mm:ss')}`
       },
       align: 'center'
     },
@@ -240,6 +213,31 @@ class Trace extends React.PureComponent<CenterProps> {
 
   // 图片信息溯源
   handlePicTrace = async data => {
+    const resp = await picTrace(data);
+    const picListArray: Array<any> = [];
+    if (resp.msg === 'ok') {
+      const parseData = JSON.parse(resp.data);
+      parseData.map(item => {
+        const { k, t, v } = item;
+        const timestamp = k.split('~')[2].substring(0, 13);
+        const tx_id = t;
+        picListArray.push({
+          timestamp,
+          tx_id,
+          ...v
+        })
+        this.setState({
+          picList: picListArray
+        })
+      })
+      this.setState({
+        loading: false,
+      })
+    }
+  }
+
+  // 传感器数据溯源 
+  handleSensorTrace = async data => {
     const resp = await sensorTrace(data);
     if (resp.msg === 'ok') {
       this.setState({
@@ -248,18 +246,8 @@ class Trace extends React.PureComponent<CenterProps> {
     }
   }
 
-  // 传感器数据溯源 
-  handleSensorTrace = async data => {
-    const resp = await (data);
-    if (resp.msg === 'ok') {
-      this.setState({
-        loading: false
-      })
-    }
-  }
-
   render() {
-    const { loading, tabKey, dataSource } = this.state;
+    const { loading, tabKey, dataSource, picList } = this.state;
     const mainSearch = (
       <div style={{ textAlign: 'center' }}>
         <RangePicker
@@ -279,7 +267,45 @@ class Trace extends React.PureComponent<CenterProps> {
         />
       </div>
     );
+    // name: "b9c52e66c1ebfc826e324a394a106f9dc9550fed4390808b2d8932ff91c92b5a"
+    // point: "point001"
+    // size: "1024"
+    // timestamp: "1594815385165736041"
+    // tx_id: "45cac0331d35f6f0c471d1e63cb6ba012cef2d8de0fec28f033384e56f58c768"
+    // type: "sensor"
+    console.log(picList)
 
+    //  模拟图片数据来源
+    const cardList = (
+      <List
+        rowKey="id"
+        grid={{ gutter: 24, xl: 4, lg: 3, md: 3, sm: 2, xs: 1 }}
+        dataSource={picList}
+        renderItem={(item, index) => (
+          <List.Item>
+            <Card
+              className={styles.card}
+              hoverable
+              cover={<img alt='采集图片' src={require(`../../../../public/images/pic${(index % 3) + 1}.jpg`)} height={124} width={207} />}
+            >
+              <Card.Meta
+                title={<span>传感器类型：{item.type}</span>}
+                description={
+                  <>
+                    <Typography.Text copyable ellipsis>图片哈希：{item.name}</Typography.Text>
+                    <Typography.Text copyable ellipsis>区块存证哈希：{item.tx_id}</Typography.Text>
+                    <Typography.Text>采集点：{item.point}</Typography.Text>
+                  </>
+                }
+              />
+              <div className={styles.cardItemContent}>
+                <span>图片时刻：{moment(new Date(Number(item.timestamp))).format('YYYY/MM/DD hh:mm:ss')}</span>
+              </div>
+            </Card>
+          </List.Item>
+        )}
+      />
+    )
     return (
       <PageHeaderWrapper
         title='冬枣信息溯源'
@@ -307,7 +333,7 @@ class Trace extends React.PureComponent<CenterProps> {
                   bordered={false}
                 >
                   <div className={styles.cardList}>{cardList}</div>
-                  <div style={{ textAlign: 'center' }}><Pagination defaultCurrent={1} total={50} /></div>
+                  {/* <div style={{ textAlign: 'center' }}><Pagination defaultCurrent={1} total={50} /></div> */}
                 </Card>
               </div>
             </TabPane>

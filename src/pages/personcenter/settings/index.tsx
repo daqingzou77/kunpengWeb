@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { Dispatch } from 'redux';
 import { GridContent, PageHeaderWrapper } from '@ant-design/pro-layout';
-import { Row, Col, Card, Icon } from 'antd';
+import { Row, Col, Card, Icon, Avatar } from 'antd';
 import BaseView from './components/base';
 import { getLoginUser, getAvatar } from './service';
 import styles from './style.less';
@@ -62,9 +62,18 @@ class Settings extends Component<SettingsProps, SettingsState> {
     }
   }
 
-  renderChildren = () => {
-    return <BaseView />;
+  renderChildren = (username: string, signature: string, phone: string, email: string, address: string, avatar: string) => {
+    const data = {
+      username, signature, phone, email, address, avatar
+    }
+    return <BaseView data={data} setAvatar={this.setAvatar} />;
   };
+
+  setAvatar = (avatar: string) => {
+    this.setState({
+      avatar
+    })
+  }
 
   render() {
     const { username, signature, phone, email, address, avatar } = this.state;
@@ -141,7 +150,7 @@ class Settings extends Component<SettingsProps, SettingsState> {
               >
                 <div className={styles.right}>
                   <div className={styles.title}>个人信息详情</div>
-                  {this.renderChildren()}
+                  {this.renderChildren(username, signature, phone, email, address, avatar)}
                 </div>
               </div>
             </Col>

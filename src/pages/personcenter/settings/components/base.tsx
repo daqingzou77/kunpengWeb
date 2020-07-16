@@ -17,8 +17,18 @@ interface SelectItem {
   key: string;
 }
 
+interface dataProps {
+  avatar: string,
+  username: string,
+  signature: string,
+  email: string,
+  phone: string,
+  address: string
+}
+
 interface BaseViewProps extends FormComponentProps {
   currentUser?: CurrentUser;
+  data?: dataProps,
 }
 
 function getBase64(img: any, callback: any) {
@@ -32,49 +42,8 @@ class BaseView extends Component<BaseViewProps> {
   view: HTMLDivElement | undefined = undefined;
 
   state = {
-    imageUrl: 'https://gw.alipayobjects.com/zos/rmsportal/BiazfanxmamNRoxxVxka.png',
-    address: '',
-    phone: '',
-    email: '',
   }
 
-  componentDidMount() {
-    this.getAvatar();
-    this.getUserList();
-  }
-
-  getAvatar = async () => {
-    const resp = await getAvatar();
-    if (resp.msg === 'ok') {
-      this.setState({
-        imageUrl: `http://202.193.60.112:8000/header/${resp.data}`
-      })
-    }
-  }
-
-  getUserList = async () => {
-    const resp = await getLoginUser();
-    if (resp.msg === 'ok') {
-      const { data: { username, email, address, phone } } = resp.data;
-      this.setState({
-        username,
-        email,
-        address,
-        phone
-      })
-    }
-  }
-
-  setBaseInfo = () => {
-    const { currentUser, form } = this.props;
-    if (currentUser) {
-      Object.keys(form.getFieldsValue()).forEach((key) => {
-        const obj = {};
-        obj[key] = currentUser[key] || null;
-        form.setFieldsValue(obj);
-      });
-    }
-  };
 
   getViewDom = (ref: HTMLDivElement) => {
     this.view = ref;
@@ -109,9 +78,7 @@ class BaseView extends Component<BaseViewProps> {
   handleChange = (info: any) => {
     if (info.file.status === 'done') {
       getBase64(info.file.originFileObj, (imageUrl: string) =>
-        this.setState({
-          imageUrl,
-        }),
+       this.props.setAvatar(imageUrl)
       );
       message.success('头像更换成功')
     }
@@ -120,8 +87,8 @@ class BaseView extends Component<BaseViewProps> {
   render() {
     const {
       form: { getFieldDecorator },
+      data: { username, phone, email, address, avatar }
     } = this.props;
-    const { imageUrl, username, email, phone, address } = this.state;
     const token = localStorage.getItem('token');
     // 更换头像组件
     const AvatarView = ({ avatar }: { avatar: string }) => (
@@ -150,7 +117,7 @@ class BaseView extends Component<BaseViewProps> {
       <div className={styles.baseView} ref={this.getViewDom}>
         <div className={styles.left}>
           <Form layout="vertical" hideRequiredMark autoComplete="off">
-            <FormItem label="昵称">
+            <FormItem label="用户名">
               {getFieldDecorator('name', {
                 rules: [
                   {
@@ -159,7 +126,7 @@ class BaseView extends Component<BaseViewProps> {
                   },
                 ],
                 initialValue: username
-              })(<Input />)}
+              })(<Input disabled />)}
             </FormItem>
             <FormItem label="邮箱">
               {getFieldDecorator('email', {
@@ -222,7 +189,7 @@ class BaseView extends Component<BaseViewProps> {
           </Form>
         </div>
         <div className={styles.right}>
-          <AvatarView avatar={imageUrl} />
+          <AvatarView avatar={avatar} />
         </div>
       </div>
     );

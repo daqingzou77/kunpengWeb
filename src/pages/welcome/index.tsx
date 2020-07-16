@@ -1,14 +1,13 @@
+/* eslint-disable default-case */
 import React, { Component, Suspense } from 'react';
+import { Card, Table, Badge } from 'antd';
 import { Dispatch } from 'redux';
 import { GridContent } from '@ant-design/pro-layout';
-import { RangePickerValue } from 'antd/es/date-picker/interface';
 import { connect } from 'dva';
 import PageLoading from './components/PageLoading';
 // eslint-disable-next-line import/no-unresolved
 import { AnalysisData, BlockInfo } from './data';
-import { blockInfo } from './service';
-import { getTimeDistance } from './utils/utils';
-import styles from './style.less';
+import { blockInfo, getTransByOpt, queryPeers } from './service';
 
 const IntroduceRow = React.lazy(() => import('./components/IntroduceRow'));
 const SalesCard = React.lazy(() => import('./components/SalesCard'));
@@ -20,16 +19,35 @@ interface AnalysisProps {
 }
 
 interface AnalysisState {
-  salesType: 'all' | 'online' | 'stores';
-  currentTabKey: string;
-  rangePickerValue: RangePickerValue;
+  data: [],
+  types: 'today' | 'week' | 'month' | 'year',
+  dataSource: []
 }
 
 class Analysis extends Component<AnalysisProps, AnalysisState> {
+
+  columns = [{
+    title: '节点',
+    render: (_, record, index) => {
+      return `节点${index + 1}`
+    }
+  }, {
+    title: '组织名称',
+    dataIndex: 'msp_id',
+    align: 'center',
+  }, {
+    title: '节点地址',
+    dataIndex: 'address',
+    align: 'center',
+  }, {
+    title: '节点状态',
+    render: () => <Badge status="success" text="正常运行" />
+  }];
+
   state: AnalysisState = {
-    salesType: 'all',
-    currentTabKey: '',
-    rangePickerValue: getTimeDistance('year'),
+    data: [],
+    types: 'today',
+    dataSource: []
   };
 
   reqRef: number = 0;
@@ -39,70 +57,58 @@ class Analysis extends Component<AnalysisProps, AnalysisState> {
   blocks: BlockInfo = {};
 
   componentDidMount() {
+    const { types } = this.state;
+    this.getInfo(types);
     this.getBlockInfo();
+    this.getPeers();
   }
 
-  // eslint-disable-next-line react/sort-comp
   getBlockInfo = async () => {
     const resp = await blockInfo();
     if (resp.msg === 'ok') {
-     this.blocks = resp.data;
+      this.blocks = resp.data;
     }
   }
 
-  componentWillUnmount() {
-    const { dispatch } = this.props;
-    dispatch({
-      type: 'dashboardAndanalysis/clear',
-    });
-    cancelAnimationFrame(this.reqRef);
-    clearTimeout(this.timeoutId);
+  getPeers = async () => {
+    const resp = await queryPeers();
+    const data = [];
+    if (resp.msg === 'ok') {
+      resp.data.map(item => {
+        const datas = JSON.parse(item);
+        data.push(datas)
+      })
+      this.setState({
+        dataSource: data
+      })
+    }
   }
 
-  handleRangePickerChange = (rangePickerValue: RangePickerValue) => {
-    const { dispatch } = this.props;
-    this.setState({
-      rangePickerValue,
-    });
-
-    dispatch({
-      type: 'dashboardAndanalysis/fetchSalesData',
-    });
+  selectDate = async (type: 'today' | 'week' | 'month' | 'year') => {
+    this.getInfo(type)
   };
 
-  selectDate = (type: 'today' | 'week' | 'month' | 'year') => {
-    const { dispatch } = this.props;
-    this.setState({
-      rangePickerValue: getTimeDistance(type),
-    });
-
-    dispatch({
-      type: 'dashboardAndanalysis/fetchSalesData',
-    });
-  };
-
-  isActive = (type: 'today' | 'week' | 'month' | 'year') => {
-    const { rangePickerValue } = this.state;
-    const value = getTimeDistance(type);
-    if (!rangePickerValue[0] || !rangePickerValue[1]) {
-      return '';
+  getInfo = async (type: string) => {
+    let types
+    switch (type) {
+      case 'today': types = 1; break;
+      case 'week': types = 2; break;
+      case 'month': types = 3; break;
+      case 'year': types = 4; break;
+      default: types = 1;
     }
-    if (
-      rangePickerValue[0].isSame(value[0], 'day') &&
-      rangePickerValue[1].isSame(value[1], 'day')
-    ) {
-      return styles.currentDate;
+    const resp = await getTransByOpt({ type: types });
+    if (resp.msg === 'ok') {
+      this.setState({
+        data: resp.data,
+        types: type
+      })
     }
-    return '';
-  };
+  }
 
   render() {
-    const { rangePickerValue } = this.state;
-    const { dashboardAndanalysis, loading } = this.props;
-    const {
-      visitData,
-      salesData,
-    } = dashboardAndanalysis;
+    const { data, types, dataSource } = this.state;
+    const { loading } = this.props;
 
     return (
       <GridContent>
@@ -115,14 +121,20 @@ class Analysis extends Component<AnalysisProps, AnalysisState> {
           {/* 折线统计 */}
           <Suspense fallback={null}>
             <SalesCard
-              rangePickerValue={rangePickerValue}
-              salesData={salesData}
-              isActive={this.isActive}
-              handleRangePickerChange={this.handleRangePickerChange}
               loading={loading}
               selectDate={this.selectDate}
+              data={data}
+              types={types}
             />
           </Suspense>
+          <Card style={{ marginTop: 25 }}>
+            <Table
+              columns={this.columns}
+              pagination={false}
+              dataSource={dataSource}
+            ></Table>
+          </Card>
+          {/* 节点信息 */}
         </React.Fragment>
       </GridContent>
     );

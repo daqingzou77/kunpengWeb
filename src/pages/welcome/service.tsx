@@ -17,3 +17,37 @@ export function blockInfo(): Promise<responseData> {
   }
   return http<responseData>(opt)
 }
+
+// 查询所有节点信息
+export function queryPeers(): Promise<responseData> {
+  const opt: AxiosRequestConfig={
+    url:`/api/v1/bcs/peers`,
+    method: 'get',
+    params:{},
+    data:{}
+  }
+  return http<responseData>(opt)
+}
+
+// 条件查询所有采集点信息
+export function getPoints(): Promise<responseData> {
+  const opt: AxiosRequestConfig={
+    url:`/api/v1/bcs/points`,
+    method: 'get',
+    params:{},
+    data:{}
+  }
+  return http<responseData>(opt)
+}
+
+// 条件查询交易数
+export function getTransByOpt(data: { type: number}): Promise<responseData> {
+  const opt: AxiosRequestConfig={
+    url:`/api/v1/bcs/transactions`,
+    method: 'post',
+    params:{},
+    data:{}
+  }
+  opt.data.type = data.type;
+  return http<responseData>(opt)
+}
