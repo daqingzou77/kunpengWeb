@@ -1,4 +1,4 @@
-import { Col, Row, DatePicker, Button, Empty } from 'antd';
+import { Col, Row, DatePicker, Button, Empty, message, List, Card, Typography } from 'antd';
 import React, { Component } from 'react';
 import { Dispatch } from 'redux';
 import { GridContent } from '@ant-design/pro-layout';
@@ -69,6 +69,7 @@ class Monitor extends Component<{}> {
     airTemperatureList: [],
     windDirectionList: [],
     windSpeedList: [],
+    picList: [],
     loading: false,
     start: '',
     stop: '',
@@ -96,9 +97,14 @@ class Monitor extends Component<{}> {
       loading: true
     })
     setTimeout(async () => {
+      var d = new Date();
+      var s = d.getTime();
       const resp = await getSensors(data);
+      d = new Date();
+      message.info(`时间花费${d.getTime()-s}ms`);
       if (Object.prototype.toString.call(resp) === '[object Array]' && resp.length > 0) {
         const newData = divideTime(resp);
+        const picList = resp[0].pictureUrl;
         const { airHumidityList, airPressureList, illuminanceList, rainfallList, airTemperatureList, windDirectionList, windSpeedList } = newData;
         this.setState({
           airHumidityList,
@@ -108,8 +114,11 @@ class Monitor extends Component<{}> {
           airTemperatureList,
           windDirectionList,
           windSpeedList,
+          picList,
           showEmpty: false
         })
+      } else {
+        this.setState({showEmpty: true})
       }
       this.setState({
         loading: false
@@ -120,7 +129,36 @@ class Monitor extends Component<{}> {
   }
 
   render() {
-    const { airHumidityList, airPressureList, illuminanceList, rainfallList, airTemperatureList, windDirectionList, windSpeedList, loading, showEmpty } = this.state;
+    const { airHumidityList, airPressureList, illuminanceList, rainfallList, airTemperatureList, windDirectionList, windSpeedList, loading, showEmpty, picList } = this.state;
+
+    const cardList = (
+      <List
+        rowKey="id"
+        grid={{ gutter: 24, xl: 4, lg: 3, md: 3, sm: 2, xs: 1 }}
+        dataSource={picList}
+        renderItem={(item, index) => (
+          <List.Item>
+            <Card
+              className={styles.card}
+              hoverable
+              cover={<img alt='采集图片' src={item} height={124} width={207} />}
+            >
+              <Card.Meta
+                title={<span>传感器类型：{'mqtt'}</span>}
+                description={
+                  <>
+                    <Typography.Text>采集点：{'智慧树'}</Typography.Text>
+                  </>
+                }
+              />
+              <div className={styles.cardItemContent}>
+                <span>图片时刻：{(this.state.start)}</span>
+              </div>
+            </Card>
+          </List.Item>
+        )}
+      />
+    )
     const mainSearch = (
       <div style={{ textAlign: 'center' }}>
         <RangePicker
@@ -202,6 +240,16 @@ class Monitor extends Component<{}> {
                     >
                       <Columnar title="风速" xAxias="collectTime" yAxias="windSpeed" data={windSpeedList} />
                     </Col>
+                  </Row>
+                  <Row>
+                    <div className={styles.coverCardList}>
+                      <Card
+                        bordered={false}
+                      >
+                        <div className={styles.cardList}>{cardList}</div>
+                        {/* <div style={{ textAlign: 'center' }}><Pagination defaultCurrent={1} total={50} /></div> */}
+                      </Card>
+                    </div>
                   </Row>
                 </React.Fragment>
               )
