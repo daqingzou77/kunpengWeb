@@ -228,11 +228,10 @@ export default {
   // },
   proxy: {
     '/api/v1': {
-      target: 'http://202.193.60.112:8000 '
+      target: 'http://202.193.60.10'
     },
     '/api/data': {
-      target: 'http://202.193.60.10:6667',
-      changeOrigin: true,
+      target: 'http://202.193.60.10',
     },
   }
 } as IConfig;
