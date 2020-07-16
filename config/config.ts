@@ -227,13 +227,12 @@ export default {
   //   },
   // },
   proxy: {
-    '/api': {
+    '/api/v1': {
       target: 'http://202.193.60.112:8000 '
     },
-    '/apiCloud': {
+    '/api/data': {
       target: 'http://202.193.60.10:6667',
       changeOrigin: true,
-      pathRewrite: { '^/apiCloud': '/api' },
     },
   }
 } as IConfig;
