@@ -10,8 +10,7 @@ import {
 } from './service';
 import styles from './style.less';
 
-const { Paragraph, } = Typography;
-// 0b323dabe99c5fbb9c14c76b3b0c0257d56a9283507f4d36a133d03ebb47a569
+const { Paragraph } = Typography;
 
 var Base64 = {
   _keyStr: "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=",
@@ -90,7 +89,7 @@ const TableList: React.FC<TableListProps> = () => {
   );
 
   const handleCheck = () => {
-    
+
   }
 
   const handleOnSearch = value => {

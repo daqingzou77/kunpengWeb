@@ -5,6 +5,7 @@ import React from 'react';
 import { connect } from 'dva';
 import { ConnectProps, ConnectState } from '@/models/connect';
 import logo from '../assets/logo.svg';
+import farmSvg from '../assets/farmSvg.svg';
 import styles from './UserLayout.less';
 
 export interface UserLayoutProps extends ConnectProps {
@@ -44,8 +45,8 @@ const UserLayout: React.FC<UserLayoutProps> = (props) => {
           <div className={styles.top}>
             <div className={styles.header}>
               <Link to="/">
-                <img alt="logo" className={styles.logo} src={logo} />
-                <span className={styles.title}>区块链冬枣溯源系统</span>
+                <img alt="logo" className={styles.logo} src={farmSvg} />
+                <span className={styles.title}>农业物联网溯源</span>
               </Link>
             </div>
             <div className={styles.desc}></div>

@@ -20,7 +20,7 @@ import RightContent from '@/components/GlobalHeader/RightContent';
 import { ConnectState } from '@/models/connect';
 import { isAntDesignPro, getAuthorityFromRouter } from '@/utils/utils';
 import Title from 'antd/lib/skeleton/Title';
-import logo from '../assets/logo.svg';
+import logo from '../assets/farm.svg';
 
 const noMatch = (
   <Result
@@ -102,12 +102,12 @@ const BasicLayout: React.FC<BasicLayoutProps> = (props) => {
       {/* 页面布局 */}
       <ProLayout
         logo={logo}
-        menuHeaderRender={(logoDom, titleDom) => (
-          <Link to="/">
-            {logoDom}
-            {titleDom}
-          </Link>
-        )}
+        // menuHeaderRender={(logoDom, titleDom) => (
+        //   <Link to="/">
+        //     {logoDom}
+        //     {titleDom}
+        //   </Link>
+        // )}
         onCollapse={handleMenuCollapse}
         menuItemRender={(menuItemProps, defaultDom) => {
           if (menuItemProps.isUrl || menuItemProps.children || !menuItemProps.path) {

@@ -4,7 +4,7 @@ import { AxiosRequestConfig } from 'axios';
 
 export const getSensors = (data: {sensor_type: string, sensor_id: string, start: string, stop: string  }) => {
   const opt: AxiosRequestConfig={
-    url:`/apiCloud/data/std/${data.sensor_type}/${data.sensor_id}`,
+    url:`/api/data/std/${data.sensor_type}/${data.sensor_id}`,
     method: 'get',
     params:{},
     data:{}

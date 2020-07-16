@@ -340,7 +340,7 @@ class Trace extends React.PureComponent<CenterProps> {
     )
     return (
       <PageHeaderWrapper
-        title='冬枣信息溯源'
+        title='农业物信息溯源'
         content={mainSearch}
       >
         <Card>

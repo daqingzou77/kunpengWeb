@@ -55,7 +55,7 @@ export default {
   menu: {
     locale: true,
   },
-  title: '区块链冬枣溯源',
+  title: '农业物联网溯源',
   pwa: false,
   iconfontUrl: '',
 } as DefaultSettings;

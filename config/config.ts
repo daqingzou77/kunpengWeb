@@ -128,7 +128,6 @@ export default {
         {
           path: '/',
           redirect: '/welcome',
-          authority: ['admin', 'user'],
         },
         {
           component: '404',
@@ -185,21 +184,16 @@ export default {
   manifest: {
     basePath: '/',
   }, // chainWebpack: webpackPlugin,
-  // proxy: {
-  //   '/server/api/': {
-  //     target: 'https://preview.pro.ant.design/',
-  //     changeOrigin: true,
-  //     pathRewrite: { '^/server': '' },
-  //   },
-  // },
   proxy: {
-    '/api': {
-      target: 'http://202.193.60.108:8000 '
+    '/api/v1': {
+      target: 'http://202.193.60.10'
     },
-    '/apiCloud': {
-      target: 'http://202.193.60.10:6667',
-      changeOrigin: true,
-      pathRewrite: { '^/apiCloud': '/api' },
+    '/api/data': {
+      target: 'http://202.193.60.10',
+      changeOrigin: true
     },
+    '/19372180': {
+      target: 'http://202.193.60.10'
+    }
   }
 } as IConfig;

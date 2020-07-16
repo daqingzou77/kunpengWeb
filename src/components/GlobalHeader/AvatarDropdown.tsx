@@ -29,7 +29,7 @@ class AvatarDropdown extends React.Component<GlobalHeaderRightProps> {
     const resp = await getAvatar();
     if (resp.msg === 'ok') {
       this.setState({
-        avatar: `http://202.193.60.112:8000/header/${resp.data}`
+        avatar: `http://202.193.60.108:8000/header/${resp.data}`
       })
     }
   }
@@ -40,7 +40,6 @@ class AvatarDropdown extends React.Component<GlobalHeaderRightProps> {
       this.handleLogout()
       return;
     }
-    router.push(`/account/${key}`);
   };
 
   compareToFirstPassword = (_, value, callback) => {
@@ -147,7 +146,6 @@ class AvatarDropdown extends React.Component<GlobalHeaderRightProps> {
     const { menu } = this.props;
     const { modalVisible, loginModalVisible, loading, avatar } = this.state;
     const currentUser = localStorage.getItem('currentUser');
-    console.log('currentUser', currentUser)
     const { getFieldDecorator } = this.props.form;
     const formItemLayout = {
       labelCol: {
@@ -199,7 +197,7 @@ class AvatarDropdown extends React.Component<GlobalHeaderRightProps> {
           visible={modalVisible}
           footer={[
             <Button key="cancel" onClick={this.handleRigsterCancel}>取消</Button>,
-            <Button key="ok" loading={loading} onClick={this.handleOnSubmitRigster}>注册</Button>
+            <Button key="ok" type="primary" loading={loading} onClick={this.handleOnSubmitRigster}>注册</Button>
           ]}
           onCancel={this.handleRigsterCancel}
           onOk={this.handleOnSubmitRigster}
