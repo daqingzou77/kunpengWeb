@@ -267,10 +267,17 @@ class Trace extends React.PureComponent<CenterProps> {
           tx_id,
           ...v
         })
-        const filterData = picListArray.filter(item => item.name !== '')
-        this.setState({
-          picList: filterData
-        })
+        const filterData = picListArray.filter(item => item.name !== '');
+        if (filterData.length > 13) {
+          const sliceArray = filterData.slice(0, 13)
+          this.setState({
+            picList: sliceArray
+          })
+        } else {
+          this.setState({
+            picList: filterData
+          })
+        }
       })
     }
     setTimeout(() => {
