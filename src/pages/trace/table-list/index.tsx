@@ -269,7 +269,7 @@ class Trace extends React.PureComponent<CenterProps> {
       const parseData = JSON.parse(resp.data);
       parseData.map(item => {
         const { k, t, v } = item;
-        const timestamp = k.split('~')[2].substring(0, 13);
+        const timestamp = moment(new Date(Number(k.split('~')[2].substring(0, 13)))).format('YYYY-MM-DD hh:mm:ss');
         const tx_id = t;
         sensorArray.push({
           timestamp,
@@ -318,7 +318,8 @@ class Trace extends React.PureComponent<CenterProps> {
             <Card
               className={styles.card}
               hoverable
-              cover={<img alt='采集图片' src={`http://202.193.60.10/${item.point}/${moment(new Date(Number(item.timestamp))).format('YYYY/MM/DD')}/${item.name}.jpg`} height={124} width={207} />}
+              // cover={<img alt='采集图片' src={`http://202.193.60.10/${item.point}/${moment(new Date(Number(item.timestamp))).format('YYYY/MM/DD')}/${item.name}.jpg`} height={124} width={207} />}
+              cover={<img alt='采集图片' src={`/0018DE743E31/2020-07-13/${item.name}.jpg`} height={124} width={207} />}
             >
               <Card.Meta
                 title={<span>传感器类型：{item.type}</span>}

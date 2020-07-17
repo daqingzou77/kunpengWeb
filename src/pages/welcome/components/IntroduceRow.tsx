@@ -33,7 +33,7 @@ const IntroduceRow = ({ loading, blockInfo }: { loading: boolean, blockInfo: Blo
             style={{
               backgroundColor: '#87d068',
             }}
-            icon="user"
+            icon="column-height"
           />
         }
         loading={loading}
@@ -59,7 +59,7 @@ const IntroduceRow = ({ loading, blockInfo }: { loading: boolean, blockInfo: Blo
             style={{
               backgroundColor: '#ffbf00',
             }}
-            icon="user"
+            icon="number"
           />
         }
         contentHeight={46}
@@ -83,7 +83,7 @@ const IntroduceRow = ({ loading, blockInfo }: { loading: boolean, blockInfo: Blo
             style={{
               backgroundColor: '#7265e6',
             }}
-            icon="user"
+            icon="trademark"
           />
         }
         contentHeight={46}
@@ -107,7 +107,7 @@ const IntroduceRow = ({ loading, blockInfo }: { loading: boolean, blockInfo: Blo
             style={{
               backgroundColor: '#f56a00',
             }}
-            icon="user"
+            icon="star"
           />
         }
         contentHeight={46}
