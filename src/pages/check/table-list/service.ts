@@ -17,14 +17,15 @@ export function checkInfo(data: { hash: string }): Promise<respType> {
   return http<respType>(opt)
 }
 
-// 19372180/2020-07-08/84cd4138f7b37b46f05b43bd9a0663571dfeff7e10586d0f9bd4df385f23d972.jpg
-
-export function backPic(data: {picUrl: string }): Promise<respType> {
+export function picCheck(data: {date: string, hash: string, point: string }): Promise<respType> {
   const opt: AxiosRequestConfig = {
-    url:`/0018DE743E31/2020-07-13/${data.picUrl}.jpg`,
-    method: 'get',
+    url:`/api/v1/trace/check`,
+    method: 'post',
     params:{},
     data:{}
   }
+  opt.data.date = data.date;
+  opt.data.hash = data.hash;
+  opt.data.point = data.point;
   return http<respType>(opt)
 }

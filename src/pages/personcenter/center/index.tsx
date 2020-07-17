@@ -141,7 +141,7 @@ class BasicForm extends Component<BasicFormProps> {
                   },
                 ],
               })(
-                <RangePicker  placeholder={['开始时间', '结束时间']} />,
+                <RangePicker  placeholder={['开始时间', '结束时间']}  format="YYYY/MM/DD HH:mm:ss" showTime />,
               )}
             </FormItem>
             <FormItem {...formItemLayout} label="操作行为">

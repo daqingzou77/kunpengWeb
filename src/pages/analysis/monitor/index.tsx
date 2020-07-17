@@ -244,6 +244,7 @@ class Monitor extends Component<{}> {
                   <Row>
                     <div className={styles.coverCardList}>
                       <Card
+                        title="图片信息"
                         bordered={false}
                       >
                         <div className={styles.cardList}>{cardList}</div>

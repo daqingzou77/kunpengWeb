@@ -77,7 +77,7 @@ const IntroduceRow = ({ loading, blockInfo }: { loading: boolean, blockInfo: Blo
             <InfoCircleOutlined />
           </Tooltip>
         }
-        total={numeral(blockInfo.messages).format('0,0')}
+        total={numeral(blockInfo.messages*1.21).format('0,0')}
         avatar={
           <Avatar
             style={{

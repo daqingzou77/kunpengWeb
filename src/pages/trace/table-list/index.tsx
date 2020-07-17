@@ -136,20 +136,24 @@ class Trace extends React.PureComponent<CenterProps> {
     dataIndex: 'point',
     align: 'center'
   }, {
-    title: '文件名',
-    dataIndex: 'name',
+    title: '传感器类型',
+    dataIndex: 'type',
     align: 'center'
   }, {
-    title: '区块哈希',
+    title: '传感器数值',
+    dataIndex: 'value',
+    align: 'center'
+  }, {
+    title: '单位',
+    dataIndex: 'unit',
+    align: 'center'
+  },{
+    title: '交易哈希',
     dataIndex: 'tx_id',
     align: 'center'
   }, {
     title: '时间戳',
     dataIndex: 'timestamp',
-    align: 'center'
-  }, {
-    title: '传感器类型',
-    dataIndex: 'type',
     align: 'center'
   }]
 
@@ -158,6 +162,7 @@ class Trace extends React.PureComponent<CenterProps> {
     endTime: '',
     loading: false,
     tabKey: '1',
+    value: '',
     sensorData: [],
     picList: [],
     dataSource: []
@@ -177,7 +182,9 @@ class Trace extends React.PureComponent<CenterProps> {
   // 处理tab
   handleChange = (val: any) => {
     this.setState({
-      tabKey: val
+      tabKey: val,
+      value: '',
+      loading: false
     })
   }
 
@@ -213,6 +220,12 @@ class Trace extends React.PureComponent<CenterProps> {
     }
   }
 
+  handleChangeValue = e => {
+    this.setState({
+      value: e.target.value
+    })
+  }
+
   // 农事数据溯源
   handleFormDataTrace = async data => {
     const resp = await formDataTrace(data);
@@ -240,6 +253,9 @@ class Trace extends React.PureComponent<CenterProps> {
   handlePicTrace = async data => {
     const resp = await picTrace(data);
     const picListArray: Array<any> = [];
+    this.setState({
+      loading: true
+    })
     if (resp.msg === 'ok') {
       const parseData = JSON.parse(resp.data);
       parseData.map(item => {
@@ -251,14 +267,17 @@ class Trace extends React.PureComponent<CenterProps> {
           tx_id,
           ...v
         })
+        const filterData = picListArray.filter(item => item.name !== '')
         this.setState({
-          picList: picListArray
+          picList: filterData
         })
       })
-      this.setState({
-        loading: false,
-      })
     }
+    setTimeout(() => {
+      this.setState({
+        loading: false
+      })
+    }, 1000)
   }
 
   // 传感器数据溯源 
@@ -287,13 +306,14 @@ class Trace extends React.PureComponent<CenterProps> {
   }
 
   render() {
-    const { loading, tabKey, sensorData, dataSource, picList } = this.state;
+    const { loading, tabKey, sensorData, dataSource, picList, value } = this.state;
     const mainSearch = (
       <div style={{ textAlign: 'center' }}>
         <RangePicker
           style={{ maxWidth: 440, width: '100%', marginRight: 10 }}
           size="large"
           showTime
+          placeholder={['起始时间', '截止时间']}
           format="YYYY/MM/DD HH:mm:ss"
           onChange={time => this.handleRangerPicker(time)}
         />
@@ -304,6 +324,8 @@ class Trace extends React.PureComponent<CenterProps> {
           size="large"
           onSearch={val => this.handleInputChange(val)}
           style={{ maxWidth: 322, width: '100%' }}
+          onChange={e => this.handleChangeValue(e)}
+          value={value}
         />
       </div>
     );
@@ -313,13 +335,12 @@ class Trace extends React.PureComponent<CenterProps> {
         rowKey="id"
         grid={{ gutter: 24, xl: 4, lg: 3, md: 3, sm: 2, xs: 1 }}
         dataSource={picList}
-        renderItem={(item, index) => (
+        renderItem={item => (
           <List.Item>
             <Card
               className={styles.card}
               hoverable
-              // cover={<img alt='采集图片' src={`http://202.193.60.10/${item.point}/${moment(new Date(Number(item.timestamp))).format('YYYY/MM/DD')}/${item.name}.jpg`} height={124} width={207} />}
-              cover={<img alt='采集图片' src={`/0018DE743E31/2020-07-13/${item.name}.jpg`} height={124} width={207} />}
+              cover={<img alt='采集图片' src={`${item.point}/${moment(new Date(Number(item.timestamp))).format('YYYY-MM-DD')}/${item.name}.jpg`} height={124} width={207} />}
             >
               <Card.Meta
                 title={<span>传感器类型：{item.type}</span>}
