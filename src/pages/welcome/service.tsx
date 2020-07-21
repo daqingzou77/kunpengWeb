@@ -30,13 +30,14 @@ export function queryPeers(): Promise<responseData> {
 }
 
 // 条件查询所有采集点信息
-export function getPoints(): Promise<responseData> {
+export function getPoints(data: {number: number}): Promise<responseData> {
   const opt: AxiosRequestConfig={
-    url:`/api/v1/bcs/points`,
+    url:`/api/v1/bcs/points/${data.number}`,
     method: 'get',
     params:{},
     data:{}
   }
+
   return http<responseData>(opt)
 }
 

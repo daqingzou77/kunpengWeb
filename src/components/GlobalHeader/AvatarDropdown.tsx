@@ -105,8 +105,12 @@ class AvatarDropdown extends React.Component<GlobalHeaderRightProps> {
         this.setState({
           currentUser: username
         })
-        message.success('用户登录成功')
-        setAuthority('guest')
+        if (username === 'admin') {
+          setAuthority(['admin', 'guest'])
+        } else {
+          setAuthority('guest');
+        }
+        message.success('用户登录成功');
         this.getAvatarUrl();
         router.push('/welcome')
       } else {

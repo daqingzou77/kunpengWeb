@@ -33,7 +33,7 @@ const SalesCard = ({
   const [rankData, changeRankData] = useState<any[]>([]);
 
   const queryData = async () => {
-    const resp = await getPoints();
+    const resp = await getPoints({number: 5});
     if (resp.msg === 'ok') {
       console.log(resp.data);
       changeRankData(resp.data)
