@@ -7,6 +7,7 @@ import { router } from 'umi';
 import { ConnectProps } from '@/models/connect';
 import { CurrentUser } from '@/models/user';
 import HeaderDropdown from '../HeaderDropdown';
+import UpdateModal from './UpdateModal';
 import { userLogin, userRigester, getAvatar } from '@/services/login';
 import { setAuthority } from '@/utils/authority'
 import styles from './index.less';
@@ -22,14 +23,22 @@ class AvatarDropdown extends React.Component<GlobalHeaderRightProps> {
     modalVisible: false,
     loginModalVisible: false,
     loading: false,
+    updateModalVisible: false,
     avatar: ''
+  }
+
+  componentDidMount() {
+    const token = localStorage.getItem('token');
+    if (token) {
+      this.getAvatarUrl()
+    }
   }
 
   getAvatarUrl = async () => {
     const resp = await getAvatar();
     if (resp.msg === 'ok') {
       this.setState({
-        avatar: `http://202.193.60.108:8000/header/${resp.data}`
+        avatar: `/header/${resp.data}`
       })
     }
   }
@@ -39,6 +48,11 @@ class AvatarDropdown extends React.Component<GlobalHeaderRightProps> {
     if (key === 'logout') {
       this.handleLogout()
       return;
+    }
+    if (key === 'settings') {
+      this.setState({
+        updateModalVisible: true
+      })
     }
   };
 
@@ -92,6 +106,12 @@ class AvatarDropdown extends React.Component<GlobalHeaderRightProps> {
     window.location.reload()
   }
 
+  handleCancelVisible = () => {
+    this.setState({
+      updateModalVisible: false
+    })
+  }
+
   // 登录提交
   handleOnSubmitLogin = () => {
     const { form } = this.props;
@@ -131,7 +151,7 @@ class AvatarDropdown extends React.Component<GlobalHeaderRightProps> {
     })
     form.validateFields(async (_: any, values: any) => {
       const { username, password, identity } = values;
-      const resp = await userRigester({ username, password, identity});
+      const resp = await userRigester({ username, password, identity });
       const { msg } = resp;
       if (msg === 'ok') {
         message.success('用户注册成功')
@@ -148,7 +168,7 @@ class AvatarDropdown extends React.Component<GlobalHeaderRightProps> {
 
   render(): React.ReactNode {
     const { menu } = this.props;
-    const { modalVisible, loginModalVisible, loading, avatar } = this.state;
+    const { modalVisible, loginModalVisible, updateModalVisible, loading, avatar } = this.state;
     const currentUser = localStorage.getItem('currentUser');
     const { getFieldDecorator } = this.props.form;
     const formItemLayout = {
@@ -167,11 +187,10 @@ class AvatarDropdown extends React.Component<GlobalHeaderRightProps> {
         {menu && (
           <Menu.Item key="settings">
             <Icon type="setting" />
-             账户设置
+             修改密码
           </Menu.Item>
         )}
         {menu && <Menu.Divider />}
-
         <Menu.Item key="logout">
           <Icon type="logout" />
           系统退出
@@ -296,6 +315,7 @@ class AvatarDropdown extends React.Component<GlobalHeaderRightProps> {
             </Form.Item>
           </Form>
         </Modal>
+        <UpdateModal visible={updateModalVisible} cancelVisible={this.handleCancelVisible} />
       </>
     )
   }

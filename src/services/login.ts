@@ -59,3 +59,16 @@ export function getAvatar(): Promise<responseData> {
   }
   return http<responseData>(opt)
 }
+
+// 修改用户密码
+export function updateUserPwd(data: { new_password: string, old_password: string }): Promise<responseData> {
+  const opt: AxiosRequestConfig = {
+    url:`/api/v1/user/password`,
+    method: 'post',
+    params:{},
+    data:{}
+  }
+  opt.data.new_password = data.new_password;
+  opt.data.old_password = data.old_password;
+  return http<responseData>(opt)
+}

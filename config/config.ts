@@ -197,6 +197,9 @@ export default {
     },
     '/0018DE743E31': {
       target: 'http://202.193.60.10'
+    },
+    '/header': {
+      target: 'http://202.193.60.108:8000'
     }
   }
 } as IConfig;

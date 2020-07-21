@@ -47,7 +47,7 @@ class Settings extends Component<SettingsProps, SettingsState> {
     const resp = await getAvatar();
     if (resp.msg === 'ok') {
       this.setState({
-        avatar: `http://202.193.60.108:8000/header/${resp.data}`
+        avatar: `/header/${resp.data}`
       })
     }
   }
