@@ -3,9 +3,10 @@ import { RouteChildrenProps } from 'react-router';
 import moment from 'moment';
 import { connect } from 'dva';
 import '@ant-design/compatible/assets/index.css';
-import { Input, DatePicker, Tabs, Card, Table, Pagination, List, Typography, message } from 'antd';
+import { Input, DatePicker, Tabs, Card, Table, Icon, List, Typography, message, Button } from 'antd';
 import { PageHeaderWrapper } from '@ant-design/pro-layout';
 import TimelineChart from '../../welcome/components/Charts/TimelineChart';
+import Pagination from './components/Pagination';
 import { StateType } from './model';
 import {
   formDataTrace,
@@ -147,7 +148,7 @@ class Trace extends React.PureComponent<CenterProps> {
     title: '单位',
     dataIndex: 'unit',
     align: 'center'
-  },{
+  }, {
     title: '交易哈希',
     dataIndex: 'tx_id',
     align: 'center'
@@ -165,7 +166,14 @@ class Trace extends React.PureComponent<CenterProps> {
     value: '',
     sensorData: [],
     picList: [],
-    dataSource: []
+    dataSource: [],
+    pageSize: '10',
+    upFarmDisabled: true,
+    downFarmDisabled: true,
+    senBook_mark: '',
+    nextBook: '',
+    firstBook: '',
+    preBook: ''
   }
 
 
@@ -184,13 +192,16 @@ class Trace extends React.PureComponent<CenterProps> {
     this.setState({
       tabKey: val,
       value: '',
-      loading: false
+      loading: false,
+      firstBook: '',
+      preBook:'',
+      nextBook: ''
     })
   }
 
   // 处理输入框
   handleInputChange = async val => {
-    const { startTime, endTime, tabKey } = this.state;
+    const { startTime, endTime, tabKey, pageSize } = this.state;
     if (!startTime || !endTime) {
       message.warning('请选择时间');
       return;
@@ -209,13 +220,18 @@ class Trace extends React.PureComponent<CenterProps> {
     const params = {
       start_time: moment(startTime).valueOf().toString(),
       end_time: moment(endTime).valueOf().toString(),
-      point: val
+      point: val,
+      page_size: pageSize,
+      book_mark: ''
     }
     if (tabKey === '1') {
+      params.book_mark = `s~${val}~${moment(startTime).valueOf().toString()}`
       this.handleSensorTrace(params);
     } else if (tabKey === '2') {
+      params.book_mark = ``
       this.handlePicTrace(params);
     } else if (tabKey === '3') {
+      params.book_mark = ``
       this.handleFormDataTrace(params);
     }
   }
@@ -290,9 +306,14 @@ class Trace extends React.PureComponent<CenterProps> {
   // 传感器数据溯源 
   handleSensorTrace = async data => {
     const resp = await sensorTrace(data);
+    const {
+      start_time,
+      point,
+    } = data;
     const sensorArray: Array<any> = [];
     if (resp.msg === 'ok') {
-      const parseData = JSON.parse(resp.data);
+      const nextBook = JSON.parse(resp.data).page.book_mark;
+      const parseData = JSON.parse(resp.data).data;
       parseData.map(item => {
         const { k, t, v } = item;
         const timestamp = moment(new Date(Number(k.split('~')[2].substring(0, 13)))).format('YYYY-MM-DD hh:mm:ss');
@@ -303,7 +324,9 @@ class Trace extends React.PureComponent<CenterProps> {
           ...v
         })
         this.setState({
-          sensorData: sensorArray
+          sensorData: sensorArray,
+          firstBook: `s~${point}~${start_time}`,
+          nextBook
         })
       })
       this.setState({
@@ -312,8 +335,105 @@ class Trace extends React.PureComponent<CenterProps> {
     }
   }
 
+  // 传感器翻页
+  handleSensorPage = async book_mark => {
+    let next_Book = '';
+    let preBook = '';
+    const { startTime, endTime, point, pageSize, firstBook } = this.state;
+    const resp = await sensorTrace({ startTime, endTime, point, book_mark, pageSize });
+    const sensorArray: Array<any> = [];
+    if (resp.msg === 'ok') {
+      const nextBook = JSON.parse(resp.data).page.book_mark;
+      const parseData = JSON.parse(resp.data).data;
+      parseData.map(item => {
+        const { k, t, v } = item;
+        const timestamp = moment(new Date(Number(k.split('~')[2].substring(0, 13)))).format('YYYY-MM-DD hh:mm:ss');
+        const tx_id = t;
+        sensorArray.push({
+          timestamp,
+          tx_id,
+          ...v
+        })
+        if (book_mark == firstBook) {
+          preBook = ''
+        } else {
+          preBook = `s~${point}~${moment(startTime).valueOf().toString()}`
+        }
+        if (nextBook) {
+          next_Book = nextBook;
+        }
+        this.setState({
+          sensorData: sensorArray,
+          preBook,
+          nextBook: next_Book,
+        })
+      })
+      this.setState({
+        loading: false
+      })
+    }
+  }  
+
+  // 图片溯源翻页
+  handlePicPage = async book_mark => {
+    const { startTime, endTime, point, pageSize, firstBook } = this.state;
+    const resp = await picTrace({ startTime, endTime, point, book_mark, pageSize });
+    const picListArray: Array<any> = [];
+    this.setState({
+      loading: true
+    })
+    if (resp.msg === 'ok') {
+      const parseData = JSON.parse(resp.data);
+      parseData.map(item => {
+        const { k, t, v } = item;
+        const timestamp = k.split('~')[2].substring(0, 13);
+        const tx_id = t;
+        picListArray.push({
+          timestamp,
+          tx_id,
+          ...v
+        })
+        const filterData = picListArray.filter(item => item.name !== '');
+        if (filterData.length > 13) {
+          const sliceArray = filterData.slice(0, 13)
+          this.setState({
+            picList: sliceArray
+          })
+        } else {
+          this.setState({
+            picList: filterData
+          })
+        }
+      })
+    }
+  }
+
+  // 农事数据翻页
+  handleFarmPage = async book_mark => {
+    const { startTime, endTime, point, pageSize, firstBook } = this.state;
+    const resp = await formDataTrace({ startTime, endTime, point, book_mark, pageSize });
+    const dataArray: Array<any> = [];
+    if (resp.msg === 'ok') {
+      const parseData = JSON.parse(resp.data);
+      parseData.map(item => {
+        const { k, t, v } = item;
+        const name = k.split('~')[1];
+        const tx_id = t;
+        dataArray.push({
+          name,
+          tx_id,
+          ...v
+        })
+      })
+      this.setState({
+        loading: false,
+        dataSource: dataArray
+      })
+    }
+  }
+
   render() {
-    const { loading, tabKey, sensorData, dataSource, picList, value } = this.state;
+    const { loading, tabKey, sensorData, dataSource, picList, value, upFarmDisabled, downFarmDisabled, nextBook, preBook } = this.state;
     const mainSearch = (
       <div style={{ textAlign: 'center' }}>
         <RangePicker
@@ -379,7 +499,9 @@ class Trace extends React.PureComponent<CenterProps> {
               <Table
                 columns={this.sensorCloumns}
                 dataSource={sensorData}
+                pagination={false}
               />
+              <Pagination type="sensor" nextBook={nextBook} preBook={preBook} handleSensorPage={this.handleSensorPage} />
               {/* <TimelineChart
                 height={400}
                 data={offlineChartData}
@@ -409,6 +531,10 @@ class Trace extends React.PureComponent<CenterProps> {
                 columns={this.columns}
                 dataSource={dataSource}
               />
+              <div style={{ float: 'right', marginTop: 10 }}>
+                <Button disabled={upFarmDisabled} onClick={this.handleUp}><Icon type="left" /> 返回上一页</Button>
+                <Button disabled={downFarmDisabled} onClick={this.handleDown}><Icon type="right" /> 跳转下一页</Button>
+              </div>
             </TabPane>
           </Tabs>
         </Card>

@@ -7,18 +7,6 @@ import {
 } from '../service';
 import styles from '../style.less';
 
-const rankingListData: {
-  title: string;
-  total: number;
-}[] = [];
-
-for (let i = 0; i < 7; i += 1) {
-  rankingListData.push({
-    title: '工专路 {no} 号店',
-    total: 323234,
-  });
-}
-
 const SalesCard = ({
   loading,
   selectDate,
@@ -80,7 +68,7 @@ const SalesCard = ({
           bodyStyle={{ height: 400 }}
         >
           <div className={styles.salesBar}>
-            <Bar height={292} title="交易量趋势" data={data} />
+            <Bar type={types} height={292} title="交易量趋势" data={data} />
           </div>
         </Card>
       </Col>

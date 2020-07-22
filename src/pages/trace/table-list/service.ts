@@ -8,7 +8,7 @@ interface respType {
 }
 
 // 农事数据溯源
-export function formDataTrace(data: { start_time: string, end_time: string, point: string }): Promise<respType>{
+export function formDataTrace(data: { start_time: string, end_time: string, point: string, page_size: string, book_mark: string }): Promise<respType>{
   const opt: AxiosRequestConfig = {
     url:`/api/v1/trace/farmData`,
     method: 'post',
@@ -18,13 +18,15 @@ export function formDataTrace(data: { start_time: string, end_time: string, poin
   opt.data = {
     star_time: data.start_time,
     end_time: data.end_time,
-    point: data.point
+    user: data.point,
+    book_mark: data.book_mark,
+    page_size: data.page_size
   }
   return http<respType>(opt)
 }
 
 // 图片信息溯源
-export function picTrace(data: { start_time: string, end_time: string, point: string }): Promise<respType> {
+export function picTrace(data: { start_time: string, end_time: string, point: string, page_size: string, book_mark: string }): Promise<respType> {
   const opt: AxiosRequestConfig = {
     url:`/api/v1/trace/picture`,
     method: 'post',
@@ -34,13 +36,15 @@ export function picTrace(data: { start_time: string, end_time: string, point: st
   opt.data = {
     star_time: data.start_time,
     end_time: data.end_time,
-    point: data.point
+    point: data.point,
+    book_mark: data.book_mark,
+    page_size: data.page_size
   }
   return http<respType>(opt)
 }
 
 // 传感器溯源
-export function sensorTrace(data: { start_time: string, end_time: string, point: string }) : Promise<respType> {
+export function sensorTrace(data: { start_time: string, end_time: string, point: string, page_size: string, book_mark: string }) : Promise<respType> {
   const opt: AxiosRequestConfig = {
     url:`/api/v1/trace/sensor`,
     method: 'post',
@@ -50,7 +54,9 @@ export function sensorTrace(data: { start_time: string, end_time: string, point:
   opt.data = {
     star_time: data.start_time,
     end_time: data.end_time,
-    point: data.point
+    point: data.point,
+    book_mark: data.book_mark,
+    page_size: data.page_size
   }
   return http<respType>(opt)
 }

@@ -24,7 +24,7 @@ const IntroduceRow = ({ loading, blockInfo }: { loading: boolean, blockInfo: Blo
         bordered={false}
         title="区块高度"
         action={
-          <Tooltip title={`当前区块高度为${blockInfo.height}`}>
+          <Tooltip title={`当前区块高度为 ${blockInfo.height}`}>
             <InfoCircleOutlined />
           </Tooltip>
         }
@@ -49,7 +49,7 @@ const IntroduceRow = ({ loading, blockInfo }: { loading: boolean, blockInfo: Blo
         loading={loading}
         title="信息数量"
         action={
-          <Tooltip title={`系统信息交易数为${blockInfo.messages}`}>
+          <Tooltip title={`系统信息交易数为 ${blockInfo.messages}`}>
             <InfoCircleOutlined />
           </Tooltip>
         }
@@ -73,7 +73,7 @@ const IntroduceRow = ({ loading, blockInfo }: { loading: boolean, blockInfo: Blo
         loading={loading}
         title="总交易量"
         action={
-          <Tooltip title={`系统交易总量为${blockInfo.messages}`}>
+          <Tooltip title={`系统交易总量为 ${blockInfo.messages}`}>
             <InfoCircleOutlined />
           </Tooltip>
         }
@@ -97,7 +97,7 @@ const IntroduceRow = ({ loading, blockInfo }: { loading: boolean, blockInfo: Blo
         bordered={false}
         title="活跃节点"
         action={
-          <Tooltip title={`当前系统活跃节点数为${blockInfo.nodes}`}>
+          <Tooltip title={`当前系统活跃节点数为 ${blockInfo.nodes}`}>
             <InfoCircleOutlined />
           </Tooltip>
         }

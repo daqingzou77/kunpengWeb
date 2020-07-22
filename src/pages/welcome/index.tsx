@@ -129,6 +129,8 @@ class Analysis extends Component<AnalysisProps, AnalysisState> {
               types={types}
             />
           </Suspense>
+          
+          {/* 节点信息 */}
           <Card style={{ marginTop: 25 }}>
             <Table
               columns={this.columns}
