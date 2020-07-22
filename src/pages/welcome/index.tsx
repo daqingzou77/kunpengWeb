@@ -37,7 +37,7 @@ class Analysis extends Component<AnalysisProps, AnalysisState> {
     align: 'center',
   }, {
     title: '节点地址',
-    dataIndex: 'peerAddr',
+    dataIndex: 'address',
     align: 'center',
   }, {
     title: '节点状态',
@@ -73,11 +73,9 @@ class Analysis extends Component<AnalysisProps, AnalysisState> {
   getPeers = async () => {
     const resp = await queryPeers();
     const data :Array<any> = [];
-    const mockAddr = ['grpcs://124.71.108.86:30605', 'grpcs://124.71.108.86:30606', 'grpcs://139.159.214.218:7051', 'grpcs://1.71.143.57:7051']
     if (resp.msg === 'ok') {
       resp.data.map((item: any, index: number) => {
         const datas = JSON.parse(item);
-        datas.peerAddr = mockAddr[index];
         data.push(datas)
       })
       this.setState({

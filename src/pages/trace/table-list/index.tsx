@@ -3,7 +3,7 @@ import { RouteChildrenProps } from 'react-router';
 import moment from 'moment';
 import { connect } from 'dva';
 import '@ant-design/compatible/assets/index.css';
-import { Input, DatePicker, Tabs, Card, Table, Icon, List, Typography, message, Button } from 'antd';
+import { Input, DatePicker, Tabs, Card, Table, Icon, List, Typography, message, Button, Select } from 'antd';
 import { PageHeaderWrapper } from '@ant-design/pro-layout';
 import TimelineChart from '../../welcome/components/Charts/TimelineChart';
 import Pagination from './components/Pagination';
@@ -11,89 +11,17 @@ import { StateType } from './model';
 import {
   formDataTrace,
   picTrace,
-  sensorTrace
+  sensorTrace,
+  getPoints
 } from './service';
 import styles from './styles.less';
 
 const { Text, Paragraph } = Typography;
 const { RangePicker } = DatePicker;
 const { TabPane } = Tabs;
-
-const titles = [
-  'Alipay',
-  'Angular',
-  'Ant Design',
-  'Ant Design Pro',
-  'Bootstrap',
-  'React',
-  'Vue',
-  'Webpack',
-];
-
-const covers = [
-  'http://img1.imgtn.bdimg.com/it/u=2100856578,582599785&fm=26&gp=0.jpg',
-  'http://img3.imgtn.bdimg.com/it/u=2538903943,1614489590&fm=26&gp=0.jpg',
-  'http://img2.imgtn.bdimg.com/it/u=4191322647,3205219533&fm=26&gp=0.jpg',
-  'http://img2.imgtn.bdimg.com/it/u=975198133,2514065197&fm=26&gp=0.jpg'
-];
-const desc = [
-  '8218f00d1ec732e871b3e4e93608ec297cbdebf0419c264f4a12ad2a1498f949',
-  '2d751ce7858c6ff087098ac74c23231d39e57e00e884680266c27e105bb86230',
-  'c4ffcb68acc7ce1be75274f57a155cea57152040cdf5b0aaff63b1234f19f145',
-  '634201b27c888963e3fa3130861c0b2535f60c2c25fa6a3085d7c2cec074db2b',
-  'a9a7cd577e8dfbe39001596a2c8cbb666a62cdaff499757504441b0ab789e5c5'
-]
-
-
-const list = [];
-for (let i = 0; i < 2; i += 1) {
-  list.push({
-    id: `fake-list-${i}`,
-    title: titles[i % 8],
-    cover: parseInt(`${i / 4}`, 10) % 2 === 0 ? covers[i % 4] : covers[3 - (i % 4)],
-    updatedAt: new Date(new Date().getTime() - 1000 * 60 * 60 * 2 * i).getTime(),
-    subDescription: desc[i % 5],
-  });
-}
-
-
-const offlineChartData: { x: number; y1: number; y2: number; y3: number; y4: number; }[] = [];
-
-for (let i = 0; i < 20; i += 1) {
-  offlineChartData.push({
-    x: new Date().getTime() + 1000 * 60 * 30 * i,
-    y1: Math.floor(Math.random() * 100) + 10,
-    y2: Math.floor(Math.random() * 100) + 10,
-    y3: Math.floor(Math.random() * 100) + 10,
-    y4: Math.floor(Math.random() * 100) + 10,
-  });
-}
-
-
-// 随机生成64位的哈希字符串
-const str = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
-const len = 64;
-function randomHash() {
-  let randStr = '';
-  for (let i = 0; i < len; i += 1) {
-    randStr += str.charAt(Math.floor(Math.random() * str.length));
-  }
-  return randStr;
-}
-
-const dataSource: any[] | undefined = [];
-for (let i = 0; i < 33; i += 1) {
-  dataSource.push({
-    hash: randomHash(),
-    time: moment(new Date().getTime() + 1000 * 60 * 30 * i).format('YYYY/MM/DD hh:mm:ss'),
-    conductor: 'daqing',
-    operation: '良好',
-    description: `请注意！这是具体信息${i}`
-  })
-}
+const { Option } = Select;
 
 //  定义接口
-
 interface CenterProps extends RouteChildrenProps {
   dispatch: Dispatch<any>;
   trace: StateType;
@@ -168,14 +96,43 @@ class Trace extends React.PureComponent<CenterProps> {
     picList: [],
     dataSource: [],
     pageSize: '10',
-    upFarmDisabled: true,
-    downFarmDisabled: true,
     senBook_mark: '',
     nextBook: '',
     firstBook: '',
-    preBook: ''
+    preBookArray: [],
+    selectPonitData: [],
+    searchValue: undefined,
   }
 
+  componentDidMount() {
+    // this.getPointsData();
+  }
+
+  getPointsData = async () => {
+    const resp = await getPoints({ number: 10 });
+    if (resp.msg === 'ok') {
+      const dataArray = []
+      resp.data.map(item => {
+        dataArray.push(item);
+      })
+      this.setState({
+        selectPonitData: dataArray
+      })
+    }
+  }
+
+  handleFresh = () => {
+    this.setState({
+      sensorData: [],
+      picList: [],
+      dataSource: [],
+      tabKey: '1',
+      nextBook: '',
+      firstBook: '',
+      preBookArray: [],
+      value: ''
+    })
+  }
 
   //  处理日期组件变化
   handleRangerPicker = (time: any) => {
@@ -194,8 +151,10 @@ class Trace extends React.PureComponent<CenterProps> {
       value: '',
       loading: false,
       firstBook: '',
-      preBook:'',
-      nextBook: ''
+      preBookArray: [],
+      nextBook: '',
+      sensorData: [],
+      picList: []
     })
   }
 
@@ -228,10 +187,11 @@ class Trace extends React.PureComponent<CenterProps> {
       params.book_mark = `s~${val}~${moment(startTime).valueOf().toString()}`
       this.handleSensorTrace(params);
     } else if (tabKey === '2') {
-      params.book_mark = ``
+      params.page_size = '8'; // 显示8条数据
+      params.book_mark = `p~${val}~${moment(startTime).valueOf().toString()}`
       this.handlePicTrace(params);
     } else if (tabKey === '3') {
-      params.book_mark = ``
+      params.book_mark = `f~${val}~${moment(startTime).valueOf().toString()}`
       this.handleFormDataTrace(params);
     }
   }
@@ -244,10 +204,12 @@ class Trace extends React.PureComponent<CenterProps> {
 
   // 农事数据溯源
   handleFormDataTrace = async data => {
+    const { preBookArray } = this.state;
     const resp = await formDataTrace(data);
     const dataArray: Array<any> = [];
     if (resp.msg === 'ok') {
-      const parseData = JSON.parse(resp.data);
+      const parseData = JSON.parse(resp.data).data;
+      const nextBook = JSON.parse(resp.data).page.book_mark;
       parseData.map(item => {
         const { k, t, v } = item;
         const name = k.split('~')[1];
@@ -257,23 +219,26 @@ class Trace extends React.PureComponent<CenterProps> {
           tx_id,
           ...v
         })
-      })
+      });
+      preBookArray.push(data.book_mark);
       this.setState({
         loading: false,
-        dataSource: dataArray
+        dataSource: dataArray,
+        firstBook: data.book_mark,
+        preBookArray,
+        nextBook
       })
     }
   }
 
   // 图片信息溯源
   handlePicTrace = async data => {
+    const { preBookArray } = this.state;
     const resp = await picTrace(data);
     const picListArray: Array<any> = [];
-    this.setState({
-      loading: true
-    })
     if (resp.msg === 'ok') {
-      const parseData = JSON.parse(resp.data);
+      const parseData = JSON.parse(resp.data).data;
+      const nextBook = JSON.parse(resp.data).page.book_mark;
       parseData.map(item => {
         const { k, t, v } = item;
         const timestamp = k.split('~')[2].substring(0, 13);
@@ -283,33 +248,22 @@ class Trace extends React.PureComponent<CenterProps> {
           tx_id,
           ...v
         })
-        const filterData = picListArray.filter(item => item.name !== '');
-        if (filterData.length > 13) {
-          const sliceArray = filterData.slice(0, 13)
-          this.setState({
-            picList: sliceArray
-          })
-        } else {
-          this.setState({
-            picList: filterData
-          })
-        }
+      })
+      preBookArray.push(data.book_mark)
+      this.setState({
+        picList: picListArray,
+        loading: false,
+        firstBook: data.book_mark,
+        nextBook,
+        preBookArray,
       })
     }
-    setTimeout(() => {
-      this.setState({
-        loading: false
-      })
-    }, 1000)
   }
 
   // 传感器数据溯源 
   handleSensorTrace = async data => {
+    const { preBookArray } = this.state;
     const resp = await sensorTrace(data);
-    const {
-      start_time,
-      point,
-    } = data;
     const sensorArray: Array<any> = [];
     if (resp.msg === 'ok') {
       const nextBook = JSON.parse(resp.data).page.book_mark;
@@ -323,28 +277,38 @@ class Trace extends React.PureComponent<CenterProps> {
           tx_id,
           ...v
         })
-        this.setState({
-          sensorData: sensorArray,
-          firstBook: `s~${point}~${start_time}`,
-          nextBook
-        })
-      })
+      });
+      preBookArray.push(data.book_mark)
       this.setState({
+        sensorData: sensorArray,
+        firstBook: data.book_mark,
+        nextBook,
+        preBookArray,
         loading: false
       })
     }
   }
 
   // 传感器翻页
-  handleSensorPage = async book_mark => {
-    let next_Book = '';
-    let preBook = '';
-    const { startTime, endTime, point, pageSize, firstBook } = this.state;
-    const resp = await sensorTrace({ startTime, endTime, point, book_mark, pageSize });
+  handleSensorPage = async (book_mark, type) => {
+    const { startTime, endTime, value, pageSize, preBookArray } = this.state;
+    const start_time = moment(startTime).valueOf().toString();
+    const end_time = moment(endTime).valueOf().toString();
+    const resp = await sensorTrace({ start_time, end_time, point: value, book_mark, page_size: pageSize });
     const sensorArray: Array<any> = [];
     if (resp.msg === 'ok') {
       const nextBook = JSON.parse(resp.data).page.book_mark;
       const parseData = JSON.parse(resp.data).data;
+      if (type === 'up') {
+        if (book_mark == preBookArray[0]) {
+          preBookArray.splice(1, preBookArray.length);
+        } else {
+          preBookArray.pop();
+        }
+      }
+      if (type == 'down') {
+        preBookArray.push(book_mark);
+      }
       parseData.map(item => {
         const { k, t, v } = item;
         const timestamp = moment(new Date(Number(k.split('~')[2].substring(0, 13)))).format('YYYY-MM-DD hh:mm:ss');
@@ -354,36 +318,35 @@ class Trace extends React.PureComponent<CenterProps> {
           tx_id,
           ...v
         })
-        if (book_mark == firstBook) {
-          preBook = ''
-        } else {
-          preBook = `s~${point}~${moment(startTime).valueOf().toString()}`
-        }
-        if (nextBook) {
-          next_Book = nextBook;
-        }
-        this.setState({
-          sensorData: sensorArray,
-          preBook,
-          nextBook: next_Book,
-        })
       })
       this.setState({
-        loading: false
+        sensorData: sensorArray,
+        preBookArray,
+        nextBook,
       })
     }
-  }  
+  }
 
   // 图片溯源翻页
-  handlePicPage = async book_mark => {
-    const { startTime, endTime, point, pageSize, firstBook } = this.state;
-    const resp = await picTrace({ startTime, endTime, point, book_mark, pageSize });
+  handlePicPage = async (book_mark, type) => {
+    const { startTime, endTime, value, preBookArray } = this.state;
+    const start_time = moment(startTime).valueOf().toString();
+    const end_time = moment(endTime).valueOf().toString();
+    const resp = await picTrace({ start_time, end_time, point: value, book_mark, page_size: '8' });
     const picListArray: Array<any> = [];
-    this.setState({
-      loading: true
-    })
     if (resp.msg === 'ok') {
-      const parseData = JSON.parse(resp.data);
+      const parseData = JSON.parse(resp.data).data;
+      const nextBook = JSON.parse(resp.data).page.book_mark;
+      if (type === 'up') {
+        if (book_mark == preBookArray[0]) {
+          preBookArray.splice(1, preBookArray.length);
+        } else {
+          preBookArray.pop();
+        }
+      }
+      if (type == 'down') {
+        preBookArray.push(book_mark);
+      }
       parseData.map(item => {
         const { k, t, v } = item;
         const timestamp = k.split('~')[2].substring(0, 13);
@@ -393,28 +356,35 @@ class Trace extends React.PureComponent<CenterProps> {
           tx_id,
           ...v
         })
-        const filterData = picListArray.filter(item => item.name !== '');
-        if (filterData.length > 13) {
-          const sliceArray = filterData.slice(0, 13)
-          this.setState({
-            picList: sliceArray
-          })
-        } else {
-          this.setState({
-            picList: filterData
-          })
-        }
+      })
+      this.setState({
+        picList: picListArray,
+        preBookArray,
+        nextBook
       })
     }
   }
 
   // 农事数据翻页
-  handleFarmPage = async book_mark => {
-    const { startTime, endTime, point, pageSize, firstBook } = this.state;
-    const resp = await formDataTrace({ startTime, endTime, point, book_mark, pageSize });
+  handleFarmPage = async (book_mark, type) => {
+    const { startTime, endTime, value, pageSize, preBookArray } = this.state;
+    const start_time = moment(startTime).valueOf().toString();
+    const end_time = moment(endTime).valueOf().toString();
+    const resp = await formDataTrace({ start_time, end_time, point: value, book_mark, page_size: pageSize });
     const dataArray: Array<any> = [];
     if (resp.msg === 'ok') {
-      const parseData = JSON.parse(resp.data);
+      const parseData = JSON.parse(resp.data).data;
+      const nextBook = JSON.parse(resp.data).page.book_mark;
+      if (type === 'up') {
+        if (book_mark == preBookArray[0]) {
+          preBookArray.splice(1, preBookArray.length);
+        } else {
+          preBookArray.pop();
+        }
+      }
+      if (type == 'down') {
+        preBookArray.push(book_mark);
+      }
       parseData.map(item => {
         const { k, t, v } = item;
         const name = k.split('~')[1];
@@ -426,14 +396,24 @@ class Trace extends React.PureComponent<CenterProps> {
         })
       })
       this.setState({
-        loading: false,
-        dataSource: dataArray
+        dataSource: dataArray,
+        preBookArray,
+        nextBook
       })
     }
   }
 
+  handleSearch = () => {
+    this.getPointsData();
+  }
+
+  handleSelectChange = value => {
+    this.setState({ searchValue: value });
+  }
+
   render() {
-    const { loading, tabKey, sensorData, dataSource, picList, value, upFarmDisabled, downFarmDisabled, nextBook, preBook } = this.state;
+    const { loading, tabKey, sensorData, dataSource, picList, value, firstBook, nextBook, preBookArray, selectPonitData, searchValue } = this.state;
+    const options = selectPonitData.map(d => <Option key={d.point}>{d.point}</Option>);
     const mainSearch = (
       <div style={{ textAlign: 'center' }}>
         <RangePicker
@@ -444,7 +424,7 @@ class Trace extends React.PureComponent<CenterProps> {
           format="YYYY/MM/DD HH:mm:ss"
           onChange={time => this.handleRangerPicker(time)}
         />
-        <Input.Search
+        {/* <Input.Search
           placeholder={tabKey === '3' ? '请输入上传用户名' : '请输入采集点'}
           loading={loading}
           enterButton="搜索"
@@ -453,7 +433,26 @@ class Trace extends React.PureComponent<CenterProps> {
           style={{ maxWidth: 322, width: '100%' }}
           onChange={e => this.handleChangeValue(e)}
           value={value}
-        />
+        /> */}
+        <Select
+          className={styles.selectStyle}
+          showSearch
+          value={searchValue}
+          defaultActiveFirstOption={false}
+          showArrow={false}
+          filterOption={false}
+          onSearch={this.handleSearch}
+          style={{ maxWidth: 322, width: '100%' }}
+          onChange={this.handleSelectChange}
+          notFoundContent={null}
+        >
+          {options}
+        </Select>
+
+        
+        <Button type="primary" style={{ height: 40, marginLeft: 10 }} onClick={this.handleFresh}>
+          <Icon type="sync" />
+        </Button>
       </div>
     );
 
@@ -497,11 +496,14 @@ class Trace extends React.PureComponent<CenterProps> {
             {/* 传感器数据统计 */}
             <TabPane tab="传感器数据统计" key="1">
               <Table
+                rowKey="sensor"
                 columns={this.sensorCloumns}
                 dataSource={sensorData}
                 pagination={false}
               />
-              <Pagination type="sensor" nextBook={nextBook} preBook={preBook} handleSensorPage={this.handleSensorPage} />
+              <div style={{ float: 'right', marginTop: 10 }}>
+                <Pagination type="sensor" nextBook={nextBook} preBookArray={preBookArray} firstBook={firstBook} handleSensorPage={this.handleSensorPage} />
+              </div>
               {/* <TimelineChart
                 height={400}
                 data={offlineChartData}
@@ -520,20 +522,27 @@ class Trace extends React.PureComponent<CenterProps> {
                   bordered={false}
                 >
                   <div className={styles.cardList}>{cardList}</div>
-                  {/* <div style={{ textAlign: 'center' }}><Pagination defaultCurrent={1} total={50} /></div> */}
                 </Card>
+                {
+                  picList.length > 0 ? (
+                    <div style={{ textAlign: 'center' }}>
+                      <Pagination type="pic" nextBook={nextBook} preBookArray={preBookArray} firstBook={firstBook} handlePicPage={this.handlePicPage} />
+                    </div>
+                  ) : null
+                }
               </div>
             </TabPane>
             {/* 农事管理数据 */}
             <TabPane tab="农事管理数据" key="3">
               <Table
+                rowKey="farm"
                 expandedRowRender={record => <p><span style={{ fontWeight: 'bold' }}>详细信息：</span>{record.info}</p>}
                 columns={this.columns}
                 dataSource={dataSource}
+                pagination={false}
               />
               <div style={{ float: 'right', marginTop: 10 }}>
-                <Button disabled={upFarmDisabled} onClick={this.handleUp}><Icon type="left" /> 返回上一页</Button>
-                <Button disabled={downFarmDisabled} onClick={this.handleDown}><Icon type="right" /> 跳转下一页</Button>
+                <Pagination type="farm" nextBook={nextBook} preBookArray={preBookArray} handleFarmPage={this.handleFarmPage} />
               </div>
             </TabPane>
           </Tabs>

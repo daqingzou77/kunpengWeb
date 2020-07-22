@@ -17,6 +17,7 @@ const { Paragraph } = Typography;
 const TableList: React.FC<TableListProps> = () => {
 
   const [loading, changeLoading] = useState<boolean>(false);
+  const [value, changeValue] = useState<string>("");
   const [data, changeData] = useState<any>({
     point: '',
     raw: '',
@@ -24,6 +25,21 @@ const TableList: React.FC<TableListProps> = () => {
     type: '',
     name: '',
   })
+
+  const handleFresh = () => {
+    changeData({
+      point: '',
+      raw: '',
+      timetamp: '',
+      type: '',
+      name: '',
+    });
+    changeValue("")
+  }
+
+  const handleChangeValue = (e: any) => {
+    changeValue(e.target.value)
+  }
 
   const mainSearch = (
     <div style={{ textAlign: 'center' }}>
@@ -33,8 +49,13 @@ const TableList: React.FC<TableListProps> = () => {
         size="large"
         loading={loading}
         onSearch={val => handleOnSearch(val)}
+        value={value}
+        onChange={e => handleChangeValue(e)}
         style={{ maxWidth: 400, width: '100%' }}
       />
+      <Button type="primary" style={{ height: 40, marginLeft: 10 }} onClick={() => handleFresh()}>
+        <Icon type="sync" />
+      </Button>
     </div>
   );
 

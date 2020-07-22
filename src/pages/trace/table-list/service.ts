@@ -60,3 +60,15 @@ export function sensorTrace(data: { start_time: string, end_time: string, point:
   }
   return http<respType>(opt)
 }
+
+// 条件查询所有采集点信息
+export function getPoints(data: {number: number}): Promise<respType> {
+  const opt: AxiosRequestConfig={
+    url:`/api/v1/bcs/points/${data.number}`,
+    method: 'get',
+    params:{},
+    data:{}
+  }
+
+  return http<respType>(opt)
+}

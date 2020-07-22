@@ -2,8 +2,7 @@
 @import './utils/utils.less';
 
 .coverCardList {
-  margin-bottom: -24px;
-
+  // margin-bottom: -24px;
   .card {
     :global {
       .ant-card-meta-title {
@@ -56,6 +55,16 @@
   :global {
     .ant-list .ant-list-item-content-single {
       max-width: 100%;
+    }
+  }
+}
+
+.selectStyle {
+  :global {
+    .ant-select-selection--single {
+      padding: 5px;
+      height: 40px;
+      margin-top: -5px;
     }
   }
 }

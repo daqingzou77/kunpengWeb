@@ -1,10 +1,11 @@
-import { Col, Row, DatePicker, Button, Empty, message, List, Card, Typography } from 'antd';
+import { Col, Row, DatePicker, Button, Empty, message, List, Card, Typography, Icon } from 'antd';
 import React, { Component } from 'react';
 import { Dispatch } from 'redux';
 import { GridContent } from '@ant-design/pro-layout';
 import { PageHeaderWrapper } from '@ant-design/pro-layout';
 import { connect } from 'dva';
 import moment from 'moment';
+import { router } from 'umi';
 import { StateType } from './model';
 import Columnar from './components/ChartCustom/Columnar';
 import Polyline from './components/ChartCustom/Polyline';
@@ -74,6 +75,7 @@ class Monitor extends Component<{}> {
     start: '',
     stop: '',
     showEmpty: true,
+    keyValue: ''
   }
 
   handleRangerPicker = time => {
@@ -101,7 +103,7 @@ class Monitor extends Component<{}> {
       var s = d.getTime();
       const resp = await getSensors(data);
       d = new Date();
-      message.info(`时间花费${d.getTime()-s}ms`);
+      message.info(`时间花费${d.getTime() - s}ms`);
       if (Object.prototype.toString.call(resp) === '[object Array]' && resp.length > 0) {
         const newData = divideTime(resp);
         const picList = resp[0].pictureUrl;
@@ -118,18 +120,16 @@ class Monitor extends Component<{}> {
           showEmpty: false
         })
       } else {
-        this.setState({showEmpty: true})
+        this.setState({ showEmpty: true })
       }
       this.setState({
         loading: false
       })
     }, 1000)
-
-
   }
 
   render() {
-    const { airHumidityList, airPressureList, illuminanceList, rainfallList, airTemperatureList, windDirectionList, windSpeedList, loading, showEmpty, picList } = this.state;
+    const { airHumidityList, airPressureList, illuminanceList, rainfallList, airTemperatureList, windDirectionList, windSpeedList, loading, showEmpty, picList, keyValue } = this.state;
 
     const cardList = (
       <List
@@ -165,11 +165,12 @@ class Monitor extends Component<{}> {
           style={{ maxWidth: 440, width: '100%', marginRight: 10 }}
           size="large"
           showTime
+          key={keyValue}
           format="YYYY/MM/DD HH:mm:ss"
           placeholder={["起始时间", "截止时间"]}
           onChange={time => this.handleRangerPicker(time)}
         />
-        <Button type="primary" style={{ width: 100, height: 40 }} loading={loading} onClick={this.handleAnalysis}>分析</Button>
+        <Button type="primary" style={{ width: 100, height: 40, fontSize: 16 }} loading={loading} onClick={this.handleAnalysis}>分析</Button>
       </div>
     );
 
@@ -193,10 +194,10 @@ class Monitor extends Component<{}> {
                         marginBottom: 24,
                       }}
                     >
-                      <Columnar title="空气湿度" xAxias="collectTime" yAxias="airHumidity" data={airHumidityList} />
+                      <Columnar title="空气湿度 %" xAxias="collectTime" yAxias="airHumidity" data={airHumidityList} />
                     </Col>
                     <Col xl={12} lg={24} md={24} sm={24} xs={24}>
-                      <Polyline title="大气压强" xAxias="collectTime" yAxias="airPressure" data={airPressureList} />
+                      <Polyline title="大气压强 Pa" xAxias="collectTime" yAxias="airPressure" data={airPressureList} />
                     </Col>
                   </Row>
 
@@ -206,7 +207,7 @@ class Monitor extends Component<{}> {
                         marginBottom: 24,
                       }}
                     >
-                      <Polyline title="光照强度" xAxias="collectTime" yAxias="illuminance" data={illuminanceList} />
+                      <Polyline title="光照强度 lx" xAxias="collectTime" yAxias="illuminance" data={illuminanceList} />
                     </Col>
 
                     <Col xl={12} lg={24} md={24} sm={24} xs={24}
@@ -224,7 +225,7 @@ class Monitor extends Component<{}> {
                         marginBottom: 24,
                       }}
                     >
-                      <Polyline title="空气温度" xAxias="collectTime" yAxias="airTemperature" data={airTemperatureList} />
+                      <Polyline title="空气温度 ℃" xAxias="collectTime" yAxias="airTemperature" data={airTemperatureList} />
                     </Col>
                     <Col xl={8} lg={24} md={24} sm={24} xs={24}
                       style={{

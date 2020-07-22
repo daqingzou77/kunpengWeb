@@ -123,7 +123,8 @@ class AvatarDropdown extends React.Component<GlobalHeaderRightProps> {
         localStorage.setItem('token', data.token);
         localStorage.setItem('currentUser', username)
         this.setState({
-          currentUser: username
+          currentUser: username,
+          loginModalVisible: false
         })
         if (username === 'admin') {
           setAuthority(['admin', 'guest'])
@@ -133,13 +134,10 @@ class AvatarDropdown extends React.Component<GlobalHeaderRightProps> {
         message.success('用户登录成功');
         this.getAvatarUrl();
         router.push('/welcome')
+        form.resetFields();
       } else {
         message.error('用户登录失败');
       }
-      this.setState({
-        loginModalVisible: false
-      })
-      form.resetFields();
     });
   }
 
