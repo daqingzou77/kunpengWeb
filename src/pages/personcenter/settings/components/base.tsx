@@ -78,6 +78,10 @@ class BaseView extends Component<BaseViewProps> {
     }
   }
 
+  handleFresh = () => {
+    this.props.form.resetFields();
+  }
+
   render() {
     const {
       form: { getFieldDecorator },
@@ -155,8 +159,9 @@ class BaseView extends Component<BaseViewProps> {
               style={{
                 width: 100,
               }}
+              onClick={this.handleFresh}
             >
-              重置信息
+              恢复默认值
             </Button>
           </Form>
         </div>

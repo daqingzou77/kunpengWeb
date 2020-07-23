@@ -9,7 +9,7 @@ export interface responseData {
 
 // 新增用户列表
 
-export function addUser(data: {username: string, password: string, role: string, identity: string}): Promise<responseData> {
+export function addUser(data: {username: string, password: string, role: number, identity: string}): Promise<responseData> {
     const opt: AxiosRequestConfig = {
       url:`/api/v1/user/register`,
       method: 'post',

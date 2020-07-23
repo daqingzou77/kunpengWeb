@@ -91,7 +91,7 @@ class Trace extends React.PureComponent<CenterProps> {
     endTime: '',
     loading: false,
     tabKey: '1',
-    value: '',
+    value: undefined,
     sensorData: [],
     picList: [],
     dataSource: [],
@@ -101,7 +101,6 @@ class Trace extends React.PureComponent<CenterProps> {
     firstBook: '',
     preBookArray: [],
     selectPonitData: [],
-    searchValue: undefined,
   }
 
   componentDidMount() {
@@ -130,7 +129,7 @@ class Trace extends React.PureComponent<CenterProps> {
       nextBook: '',
       firstBook: '',
       preBookArray: [],
-      value: ''
+      value: undefined
     })
   }
 
@@ -148,7 +147,7 @@ class Trace extends React.PureComponent<CenterProps> {
   handleChange = (val: any) => {
     this.setState({
       tabKey: val,
-      value: '',
+      value: undefined,
       loading: false,
       firstBook: '',
       preBookArray: [],
@@ -196,9 +195,15 @@ class Trace extends React.PureComponent<CenterProps> {
     }
   }
 
-  handleChangeValue = e => {
+  handleValueChange  = e => {
     this.setState({
       value: e.target.value
+    })
+  }
+
+  handleChangeValue = value => {
+    this.setState({
+      value
     })
   }
 
@@ -220,6 +225,7 @@ class Trace extends React.PureComponent<CenterProps> {
           ...v
         })
       });
+      preBookArray.splice(0, preBookArray.length);
       preBookArray.push(data.book_mark);
       this.setState({
         loading: false,
@@ -248,8 +254,9 @@ class Trace extends React.PureComponent<CenterProps> {
           tx_id,
           ...v
         })
-      })
-      preBookArray.push(data.book_mark)
+      });
+      preBookArray.splice(0, preBookArray.length);
+      preBookArray.push(data.book_mark);
       this.setState({
         picList: picListArray,
         loading: false,
@@ -278,7 +285,8 @@ class Trace extends React.PureComponent<CenterProps> {
           ...v
         })
       });
-      preBookArray.push(data.book_mark)
+      preBookArray.splice(0, preBookArray.length);
+      preBookArray.push(data.book_mark);
       this.setState({
         sensorData: sensorArray,
         firstBook: data.book_mark,
@@ -424,32 +432,39 @@ class Trace extends React.PureComponent<CenterProps> {
           format="YYYY/MM/DD HH:mm:ss"
           onChange={time => this.handleRangerPicker(time)}
         />
-        {/* <Input.Search
-          placeholder={tabKey === '3' ? '请输入上传用户名' : '请输入采集点'}
-          loading={loading}
-          enterButton="搜索"
-          size="large"
-          onSearch={val => this.handleInputChange(val)}
-          style={{ maxWidth: 322, width: '100%' }}
-          onChange={e => this.handleChangeValue(e)}
-          value={value}
-        /> */}
-        <Select
-          className={styles.selectStyle}
-          showSearch
-          value={searchValue}
-          defaultActiveFirstOption={false}
-          placeholder={tabKey === '3' ? '请输入上传用户名' : '请输入采集点'}
-          showArrow={false}
-          filterOption={false}
-          onSearch={this.handleSearch}
-          style={{ maxWidth: 322, width: '100%' }}
-          onChange={e => this.handleChangeValue(e)}
-          notFoundContent={null}
-        >
-          {options}
-        </Select>
-        <Button className={styles.search} onClick={this.handleInputChange} type="primary" style={{ height: 40, marginLeft: 10 }}>搜索</Button>
+        {tabKey === '3' ? (
+          <Input.Search
+            placeholder={tabKey === '3' ? '请输入上传用户名' : '请输入采集点'}
+            loading={loading}
+            enterButton="搜索"
+            size="large"
+            onSearch={val => this.handleInputChange(val)}
+            style={{ maxWidth: 322, width: '100%' }}
+            onChange={e => this.handleValueChange(e)}
+            value={value}
+          />
+        ) : (
+            <>
+              <Select
+                className={styles.selectStyle}
+                showSearch
+                value={value}
+                defaultActiveFirstOption={false}
+                placeholder={"请输入采集点"}
+                showArrow={false}
+                filterOption={false}
+                onSearch={this.handleSearch}
+                style={{ maxWidth: 322, width: '100%' }}
+                onChange={this.handleChangeValue}
+                notFoundContent={null}
+              >
+                {options}
+              </Select>
+              <Button className={styles.search} onClick={this.handleInputChange} type="primary" style={{ height: 40, marginLeft: 10 }}>搜索</Button>
+            </>
+          )}
+
+
         <Button type="primary" style={{ height: 40, marginLeft: 10 }} onClick={this.handleFresh}>
           <Icon type="sync" />
         </Button>

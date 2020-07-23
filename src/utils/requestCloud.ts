@@ -36,11 +36,11 @@ service.interceptors.response.use(
     } = response;
     if (response.status !== 200) { // 此处加status的判断是应对删除结构中不返回对象，只返回单个字段的问题
       // res.msg is backend error msg
-      notification.error({
-        type: 'error',
-        message: `请求错误 ${res.code}: ${url}`,
-        description: res.msg,
-      });
+      // notification.error({
+      //   type: 'error',
+      //   message: `请求错误 ${res.code}: ${url}`,
+      //   description: res.msg,
+      // });
       return Promise.reject(new Error(res.msg || 'Error'));
     }
     return response;
@@ -62,11 +62,11 @@ service.interceptors.response.use(
     const {
       config: { url },
     } = error;
-    notification.error({
-      type: 'error',
-      message: `请求错误 ${resp.code}: ${url}`,
-      description: resp.msg,
-    });
+    // notification.error({
+    //   type: 'error',
+    //   message: `请求错误 ${resp.code}: ${url}`,
+    //   description: resp.msg,
+    // });
     return Promise.reject(error);
   },
 );

@@ -57,11 +57,19 @@ class BasicForm extends Component<BasicFormProps> {
       }
     });
   };
-  
 
+  handleFresh = () => {
+    const { form } = this.props;
+    form.resetFields();
+    this.setState({
+      keyValue: new Date()
+    })
+    
+  }
+  
   render() {
     const { submitting } = this.props;
-    const { loading } = this.state;
+    const { loading, keyValue} = this.state;
     const {
       form: { getFieldDecorator },
     } = this.props;
@@ -141,7 +149,7 @@ class BasicForm extends Component<BasicFormProps> {
                   },
                 ],
               })(
-                <RangePicker  placeholder={['开始时间', '结束时间']}  format="YYYY/MM/DD HH:mm:ss" showTime />,
+                <RangePicker keyValue={keyValue}  placeholder={['开始时间', '结束时间']}  format="YYYY/MM/DD HH:mm:ss" showTime />,
               )}
             </FormItem>
             <FormItem {...formItemLayout} label="操作行为">
@@ -196,6 +204,7 @@ class BasicForm extends Component<BasicFormProps> {
                   marginLeft: 20,
                   width: 100,
                 }}
+                onClick={this.handleFresh}
                 type="danger"
               >
                 重置

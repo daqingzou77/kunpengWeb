@@ -1,6 +1,5 @@
 import React from 'react';
 import { PageHeaderWrapper } from '@ant-design/pro-layout';
-import { PlusSquareFilled } from '@ant-design/icons';
 import { Button, Input, Table, Tag, Modal, Form, Select, Card, Icon, message } from 'antd';
 import {
   addUser,
@@ -9,6 +8,7 @@ import {
 } from './service'
 import styles from './style.less';
 import moment from 'moment';
+import { repeat } from 'lodash';
 
 const { Option } = Select;
 
@@ -135,6 +135,9 @@ class userManage extends React.Component {
   queryUser = async () => {
     const resp = await getUserList();
     if (resp.msg === 'ok') {
+      resp.data.map(item => {
+        item.created_on = item.created_on * 1000;
+      })
       this.setState({
         dataSource: resp.data
       })
@@ -205,7 +208,7 @@ class userManage extends React.Component {
                 批量注销
               </Button>
             </div>
-            <Tabl
+            <Table
               rowKey={(record) => record.user_name}
               loading={loading}
               rowSelection={rowSelection}
@@ -217,7 +220,6 @@ class userManage extends React.Component {
                   <p><span style={{ fontWeight: 'bold' }}>地址:</span>{record.address}</p>
                 </>
               }
-
             // pagination={{
             //   total: data?.total,
             //   pageSize: params.page_size,
@@ -302,11 +304,11 @@ class userManage extends React.Component {
                       message: 'Please input your password!',
                     },
                   ],
-                  initialValue: '0'
+                  initialValue: 0
                 })(
                   <Select>
-                    <Option value={'0'}>管理员</Option>
-                    <Option value={'1'}>普通用户</Option>
+                    <Option value={0}>管理员</Option>
+                    <Option value={1}>普通用户</Option>
                   </Select>)}
               </Form.Item>
               <Form.Item label="用户标识">

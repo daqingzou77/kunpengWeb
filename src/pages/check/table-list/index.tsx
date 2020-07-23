@@ -72,7 +72,8 @@ const TableList: React.FC<TableListProps> = () => {
               <p>文件哈希：{fileHash}</p>
               <p>校验哈希: {checkHash}</p>
             </div>
-          )
+          ),
+          okText: '确认'
       })
     } else {
       Modal.warning({

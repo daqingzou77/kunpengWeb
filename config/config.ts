@@ -106,6 +106,13 @@ export default {
           component: './check/table-list'
         },
         {
+          path: '/uasrmange',
+          name: '用户管理',
+          authority: ['admin'],
+          icon: 'tool',
+          component: './manage/usermanage'
+        },
+        {
           path: '/account',
           icon: 'user',
           name: '个人中心',
@@ -186,7 +193,7 @@ export default {
   }, // chainWebpack: webpackPlugin,
   proxy: {
     '/api/v1': {
-      target: 'http://202.193.60.10'
+      target: 'http://202.193.60.108:8000'
     },
     '/api/data': {
       target: 'http://202.193.60.10',
