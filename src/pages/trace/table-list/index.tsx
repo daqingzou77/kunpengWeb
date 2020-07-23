@@ -159,13 +159,13 @@ class Trace extends React.PureComponent<CenterProps> {
   }
 
   // 处理输入框
-  handleInputChange = async val => {
-    const { startTime, endTime, tabKey, pageSize } = this.state;
+  handleInputChange = () => {
+    const { startTime, endTime, tabKey, pageSize, value } = this.state;
     if (!startTime || !endTime) {
       message.warning('请选择时间');
       return;
     }
-    if (!val) {
+    if (!value) {
       if (tabKey === '3') {
         message.warning('请输入上传数据的用户名');
       } else {
@@ -179,19 +179,19 @@ class Trace extends React.PureComponent<CenterProps> {
     const params = {
       start_time: moment(startTime).valueOf().toString(),
       end_time: moment(endTime).valueOf().toString(),
-      point: val,
+      point: value,
       page_size: pageSize,
       book_mark: ''
     }
     if (tabKey === '1') {
-      params.book_mark = `s~${val}~${moment(startTime).valueOf().toString()}`
+      params.book_mark = `s~${value}~${moment(startTime).valueOf().toString()}`
       this.handleSensorTrace(params);
     } else if (tabKey === '2') {
       params.page_size = '8'; // 显示8条数据
-      params.book_mark = `p~${val}~${moment(startTime).valueOf().toString()}`
+      params.book_mark = `p~${value}~${moment(startTime).valueOf().toString()}`
       this.handlePicTrace(params);
     } else if (tabKey === '3') {
-      params.book_mark = `f~${val}~${moment(startTime).valueOf().toString()}`
+      params.book_mark = `f~${value}~${moment(startTime).valueOf().toString()}`
       this.handleFormDataTrace(params);
     }
   }
@@ -439,17 +439,17 @@ class Trace extends React.PureComponent<CenterProps> {
           showSearch
           value={searchValue}
           defaultActiveFirstOption={false}
+          placeholder={tabKey === '3' ? '请输入上传用户名' : '请输入采集点'}
           showArrow={false}
           filterOption={false}
           onSearch={this.handleSearch}
           style={{ maxWidth: 322, width: '100%' }}
-          onChange={this.handleSelectChange}
+          onChange={e => this.handleChangeValue(e)}
           notFoundContent={null}
         >
           {options}
         </Select>
-
-        
+        <Button className={styles.search} onClick={this.handleInputChange} type="primary" style={{ height: 40, marginLeft: 10 }}>搜索</Button>
         <Button type="primary" style={{ height: 40, marginLeft: 10 }} onClick={this.handleFresh}>
           <Icon type="sync" />
         </Button>
