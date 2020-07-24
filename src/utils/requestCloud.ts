@@ -3,7 +3,7 @@ import { notification } from 'antd';
 
 const service = axios.create({
   baseURL: process.env.BACK_END_BASE, // url = base url + request url
-  timeout: 5000*12,
+  timeout: 5000,
   withCredentials: true // send cookies when cross-domain requests
 });
 
@@ -48,7 +48,6 @@ service.interceptors.response.use(
   (error: AxiosError) => {
     const response = error.response! || ({} as AxiosResponse);
     const { data = {} } = response;
-    console.log(response)
     if (response.status === 401) {
       localStorage.removeItem('currentUser');
       localStorage.removeItem('token')
@@ -59,6 +58,15 @@ service.interceptors.response.use(
       msg: innerData.msg || data.msg || response.statusText || data.code,
       data: error,
     };
+    if (error.code === 'ECONNABORTED' && error.message.indexOf('timeout') !== -1) {
+      console.log('根据你设置的timeout/真的请求超时 判断请求现在超时了，你可以在这里加入超时的处理方案');
+      notification.error({
+      type: 'warning',
+      message: '请求处理超时，请重新尝试·',
+      description: resp.msg,
+    });
+      // return service.request(originalRequest);//例如再重复请求一次
+    }
     const {
       config: { url },
     } = error;

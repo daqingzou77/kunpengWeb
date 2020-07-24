@@ -215,16 +215,20 @@ class Trace extends React.PureComponent<CenterProps> {
     if (resp.msg === 'ok') {
       const parseData = JSON.parse(resp.data).data;
       const nextBook = JSON.parse(resp.data).page.book_mark;
-      parseData.map(item => {
-        const { k, t, v } = item;
-        const name = k.split('~')[1];
-        const tx_id = t;
-        dataArray.push({
-          name,
-          tx_id,
-          ...v
-        })
-      });
+      if (parseData.length > 0) {
+        parseData.map(item => {
+          const { k, t, v } = item;
+          const name = k.split('~')[1];
+          const tx_id = t;
+          dataArray.push({
+            name,
+            tx_id,
+            ...v
+          })
+        });
+      } else {
+        message.info('溯源数据为空，请重新尝试')
+      }
       preBookArray.splice(0, preBookArray.length);
       preBookArray.push(data.book_mark);
       this.setState({
@@ -245,16 +249,20 @@ class Trace extends React.PureComponent<CenterProps> {
     if (resp.msg === 'ok') {
       const parseData = JSON.parse(resp.data).data;
       const nextBook = JSON.parse(resp.data).page.book_mark;
-      parseData.map(item => {
-        const { k, t, v } = item;
-        const timestamp = k.split('~')[2].substring(0, 13);
-        const tx_id = t;
-        picListArray.push({
-          timestamp,
-          tx_id,
-          ...v
-        })
-      });
+      if (parseData.length > 0) {
+        parseData.map(item => {
+          const { k, t, v } = item;
+          const timestamp = k.split('~')[2].substring(0, 13);
+          const tx_id = t;
+          picListArray.push({
+            timestamp,
+            tx_id,
+            ...v
+          })
+        });
+      } else {
+        message.info('溯源数据为空，请重新尝试');
+      }
       preBookArray.splice(0, preBookArray.length);
       preBookArray.push(data.book_mark);
       this.setState({
@@ -275,16 +283,20 @@ class Trace extends React.PureComponent<CenterProps> {
     if (resp.msg === 'ok') {
       const nextBook = JSON.parse(resp.data).page.book_mark;
       const parseData = JSON.parse(resp.data).data;
-      parseData.map(item => {
-        const { k, t, v } = item;
-        const timestamp = moment(new Date(Number(k.split('~')[2].substring(0, 13)))).format('YYYY-MM-DD hh:mm:ss');
-        const tx_id = t;
-        sensorArray.push({
-          timestamp,
-          tx_id,
-          ...v
-        })
-      });
+      if (parseData.length > 0) {
+        parseData.map(item => {
+          const { k, t, v } = item;
+          const timestamp = moment(new Date(Number(k.split('~')[2].substring(0, 13)))).format('YYYY-MM-DD hh:mm:ss');
+          const tx_id = t;
+          sensorArray.push({
+            timestamp,
+            tx_id,
+            ...v
+          })
+        });
+      } else {
+        message.info('溯源数据返回为空，请重新尝试')
+      }
       preBookArray.splice(0, preBookArray.length);
       preBookArray.push(data.book_mark);
       this.setState({
@@ -460,7 +472,7 @@ class Trace extends React.PureComponent<CenterProps> {
               >
                 {options}
               </Select>
-              <Button className={styles.search} onClick={this.handleInputChange} type="primary" style={{ height: 40, marginLeft: 10 }}>搜索</Button>
+              <Button loading={loading} className={styles.search} onClick={this.handleInputChange} type="primary" style={{ height: 40, marginLeft: 10 }}>搜索</Button>
             </>
           )}
 

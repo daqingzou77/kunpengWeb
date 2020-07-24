@@ -99,11 +99,7 @@ class Monitor extends Component<{}> {
       loading: true
     })
     setTimeout(async () => {
-      var d = new Date();
-      var s = d.getTime();
       const resp = await getSensors(data);
-      d = new Date();
-      message.info(`时间花费${d.getTime() - s}ms`);
       if (Object.prototype.toString.call(resp) === '[object Array]' && resp.length > 0) {
         const newData = divideTime(resp);
         const picList = resp[0].pictureUrl;
@@ -120,6 +116,7 @@ class Monitor extends Component<{}> {
           showEmpty: false
         })
       } else {
+        message.info('分析数据返回为空，请重新选择时段')
         this.setState({ showEmpty: true })
       }
       this.setState({

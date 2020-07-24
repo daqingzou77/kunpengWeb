@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Form } from '@ant-design/compatible';
 import moment from 'moment';
 import '@ant-design/compatible/assets/index.css';
-import { Input, Card, Icon, Typography, Empty, Button, Modal } from 'antd';
+import { Input, Card, Icon, Typography, Empty, Button, Modal, message } from 'antd';
 import { PageHeaderWrapper } from '@ant-design/pro-layout';
 import {
   checkInfo,
@@ -92,6 +92,8 @@ const TableList: React.FC<TableListProps> = () => {
         const dataParse = JSON.parse(Base64.decode(data.raw).split('~')[0]);
         const assData = Object.assign(data, dataParse)
         changeData(assData);
+      } else {
+        message.warning("请检查溯源哈希值是否正确")
       }
       changeLoading(false);
     }, 1000)
