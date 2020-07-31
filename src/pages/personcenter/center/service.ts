@@ -21,5 +21,15 @@ export function uploadRecord(data: {oper_name: string, oper_type:string, info: s
     start_time: data.start_time,
     end_time: data.end_time
   }
-  return http<respType>(opt)
+  return http<respType>(opt);
+}
+
+export function getOperType(): Promise<respType> {
+  const opt: AxiosRequestConfig = {
+    url:`/api/v1/user/operType`,
+    method: 'get',
+    params:{},
+    data:{}
+  }
+  return http<respType>(opt);
 }

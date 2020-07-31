@@ -11,7 +11,7 @@ import { Form } from '@ant-design/compatible';
 import { Dispatch } from 'redux';
 import { FormComponentProps } from '@ant-design/compatible/es/form';
 import { PageHeaderWrapper } from '@ant-design/pro-layout';
-import { uploadRecord } from './service';
+import { uploadRecord, getOperType } from './service';
 import { connect } from 'dva';
 import moment from 'moment';
 
@@ -27,7 +27,28 @@ interface BasicFormProps extends FormComponentProps {
 class BasicForm extends Component<BasicFormProps> {
 
   state ={
-    loading: false
+    loading: false,
+    options: [],
+  }
+
+  componentDidMount() {
+    this.getOperateType()
+  }
+
+  getOperateType = async () => {
+    const resp = await getOperType();
+    if (resp.msg === 'ok') {
+       let dataArray: any[] = []
+       resp.data.map(item => {
+         dataArray.push({
+           label: item.value,
+           value: item.value
+         })
+       })
+       this.setState({
+        options: dataArray
+       })
+    }
   }
 
   handleSubmit = (e: React.FormEvent) => {
@@ -69,24 +90,24 @@ class BasicForm extends Component<BasicFormProps> {
   
   render() {
     const { submitting } = this.props;
-    const { loading, keyValue} = this.state;
+    const { loading, keyValue, options} = this.state;
     const {
       form: { getFieldDecorator },
     } = this.props;
-    const options = [
-      {
-        label: '施肥',
-        value: '施肥',
-      },
-      {
-        label: '喷药',
-        value: '喷药',
-      },
-      {
-        label: '其他',
-        value: '其他',
-      },
-    ];
+    // const options = [
+    //   {
+    //     label: '施肥',
+    //     value: '施肥',
+    //   },
+    //   {
+    //     label: '喷药',
+    //     value: '喷药',
+    //   },
+    //   {
+    //     label: '其他',
+    //     value: '其他',
+    //   },
+    // ];
     const formItemLayout = {
       labelCol: {
         xs: {

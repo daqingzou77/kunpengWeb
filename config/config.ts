@@ -203,14 +203,14 @@ export default {
       target: 'http://1.71.135.106:8888'
     },
     '/api/data': {
-      target: 'http://1.71.135.106',
+      target: 'http://1.71.135.106:8888',
       changeOrigin: true
     },
     '/19372180': {
-      target: 'http://1.71.135.106'
+      target: 'http://1.71.135.106:8888'
     },
     '/0018DE743E31': {
-      target: 'http://1.71.135.106'
+      target: 'http://1.71.135.106:8888'
     },
     '/header': {
       target: 'http://1.71.135.106:8888'
