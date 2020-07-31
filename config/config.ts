@@ -82,6 +82,12 @@ export default {
       authority: ['admin', 'user', 'guest'],
       routes: [
         {
+          path: '/home',
+          name: '产品介绍',
+          icon: 'home',
+          component: './home'
+        },
+        {
           path: '/welcome',
           name: '网络监控',
           icon: 'eye',
@@ -188,25 +194,26 @@ export default {
       return localName;
     },
   },
+
   manifest: {
     basePath: '/',
   }, // chainWebpack: webpackPlugin,
   proxy: {
     '/api/v1': {
-      target: 'http://202.193.60.108:8000'
+      target: 'http://1.71.135.106:8888'
     },
     '/api/data': {
-      target: 'http://202.193.60.10',
+      target: 'http://1.71.135.106',
       changeOrigin: true
     },
     '/19372180': {
-      target: 'http://202.193.60.10'
+      target: 'http://1.71.135.106'
     },
     '/0018DE743E31': {
-      target: 'http://202.193.60.10'
+      target: 'http://1.71.135.106'
     },
     '/header': {
-      target: 'http://202.193.60.108:8000'
+      target: 'http://1.71.135.106:8888'
     }
   }
 } as IConfig;

@@ -2,14 +2,15 @@
 import { Avatar, Icon, Menu, Modal, Form, Input, message, Button } from 'antd';
 import { LogoutOutlined, LoginOutlined } from '@ant-design/icons';
 import { ClickParam } from 'antd/es/menu';
-import React from 'react';
+import React, { useCallback } from 'react';
 import { router } from 'umi';
 import { ConnectProps } from '@/models/connect';
 import { CurrentUser } from '@/models/user';
 import HeaderDropdown from '../HeaderDropdown';
 import UpdateModal from './UpdateModal';
 import { userLogin, userRigester, getAvatar } from '@/services/login';
-import { setAuthority } from '@/utils/authority'
+import { setAuthority } from '@/utils/authority';
+import { checkIdCard } from '@/utils/utils';
 import styles from './index.less';
 
 export interface GlobalHeaderRightProps extends ConnectProps {
@@ -72,6 +73,14 @@ class AvatarDropdown extends React.Component<GlobalHeaderRightProps> {
     }
     callback();
   };
+
+  checkNumber = (_, value, callback) => {
+    if (value && !checkIdCard(value)) {
+      callback('请输入正确的身份证号')
+    } else {
+      callback()
+    }
+  }
 
   handleLogin = () => {
     this.setState({
@@ -268,14 +277,16 @@ class AvatarDropdown extends React.Component<GlobalHeaderRightProps> {
                 />,
               )}
             </Form.Item>
-            <Form.Item label="身份标识">
+            <Form.Item label="身份证号">
               {getFieldDecorator('identity', {
-                rules: [{ required: true, message: '身份标识不能为空' }],
+                rules: [{ required: true, message: '身份证号不能为空' }, {
+                  validator: this.checkNumber
+                }],
               })(
                 <Input
                   prefix={<Icon type="environment" style={{ color: 'rgba(0,0,0,.25)' }} />}
                   type="identity"
-                  placeholder="请输入身份标识"
+                  placeholder="请输入身份证号"
                 />,
               )}
             </Form.Item>

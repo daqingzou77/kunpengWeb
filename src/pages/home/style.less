@@ -1,0 +1,78 @@
+
+.row {
+  margin-bottom: 30px;
+}
+
+.crouselCard {
+  :global {
+    .ant-card-body {
+      padding: 0px;
+    }
+    .ant-carousel {
+      margin-bottom: -5px;
+    }
+  }
+}
+
+.borderSty {
+  :global {
+    .ant-card-bordered {
+      height: 585px;
+    }
+  }
+}
+
+.borderDesc {
+  :global {
+    .ant-card-bordered {
+      height: 409px;
+    }
+  }
+}
+
+.cpjs {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: -8px;
+}
+
+.desc {
+  position: relative;
+  height: 150px;
+  h2 { 
+    font-size: 30px;
+    color: red;
+    position: absolute;
+    left: 5%;
+    top: 10%;
+    display: flex;
+  }
+  .tPrice {
+    font-size: 14px;
+    text-align: center;
+    line-height: 30px;
+    border: 1px red solid;
+    border-radius: 10px;
+    margin-left: 15px;
+    margin-top: 10px;
+    height: 30px;
+    width: 80px;
+  }
+  .lydzDes {
+    font-weight: bold;
+    position: absolute;
+    top: 45%;
+    left: 5%;
+  }
+  .gjrz {
+    position: absolute;
+    top: 62%;
+    left: 5%;
+  }
+}
+
+:global {
+  .ant-list-items {
+    word-break: break-word;
+  }
+}

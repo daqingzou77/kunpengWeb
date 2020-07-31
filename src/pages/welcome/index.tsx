@@ -129,7 +129,7 @@ class Analysis extends Component<AnalysisProps, AnalysisState> {
           </Suspense>
           
           {/* 节点信息 */}
-          <Card style={{ marginTop: 25 }}>
+          <Card style={{ marginTop: 25, marginBottom: 30 }}>
             <Table
               columns={this.columns}
               pagination={false}
